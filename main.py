@@ -90,6 +90,7 @@ print(f'Z-Score outliners:\r\n{main_analyzer.calc_zscore_outliners()}')
 #     print(f'Frequency {frequency} anomalies:\r\n'
 #           f'{anomalies_df}\r\n')
 #
+breakpoint()
 print('SSSSSS')
 
 
