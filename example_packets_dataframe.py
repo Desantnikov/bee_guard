@@ -1,4 +1,4 @@
-EXAMPLE_DATAFRAME = {
+EXAMPLE_DATAFRAME_INITIAL = {  # 20 packets
     'xacc': [22, 22, 22, 22, 22, 22, 21, 22, 21, 21, 22, 21, 22, 22, 22, 22, -121, -149, -68, -81],
     'yacc': [-67, -67, -67, -66, -67, -67, -66, -67, -67, -67, -66, -67, -67, -67, -67, -67, 430, 465, 667, 732],
     'zacc': [-999, -999, -999, -999, -999, -999, -998, -999, -999, -999, -999, -999, -999, -999, -999, -999, -1161, 699,
@@ -11,24 +11,17 @@ EXAMPLE_DATAFRAME = {
     'zmag': [640, 697, 664, 623, 659, 688, 631, 663, 650, 671, 657, 664, 645, 639, 647, 630, 686, -74, -93, -85],
     'temperature': [4528, 4480, 4480, 4480, 4480, 4528, 4528, 4528, 4480, 4528, 4528, 4528, 4480, 4528, 4528, 4528,
                     4480, 4480, 4480, 4528],
-    'xacc_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                   False, False, True, True, True, True],
-    'yacc_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                   False, False, True, True, True, True],
-    'zacc_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                   False, False, True, True, True, True],
-    'xgyro_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                    False, False, True, True, True, True],
-    'ygyro_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                    False, False, True, True, True, True],
-    'zgyro_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                    False, False, True, True, True, True],
-    'xmag_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                   False, False, True, True, True, True],
-    'ymag_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                   False, False, True, True, True, True],
-    'zmag_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False, False,
-                   False, False, False, False, False, False],
-    'temperature_alarm': [False, False, False, False, False, False, False, False, False, False, False, False, False,
-                          False, False, False, False, False, False, False]
+}
+
+EXAMPLE_DATAFRAME_ALARM = {  # 5 packets with one with xgyro -10000
+    'xacc': [22, 22, 22, 22, 22],
+    'yacc': [-67, -67, -67, -66, -67],
+    'zacc': [-999, -999, -999, -999, -999],
+    'xgyro': [-24, -24, -24, -24, -100000],
+    'ygyro': [-7, -8, -9, -7, -7],
+    'zgyro': [-1, -1, -1, -1, -1],
+    'xmag': [112, 100, 87, 116, 122],
+    'ymag': [175, 173, 174, 174, 175],
+    'zmag': [640, 697, 664, 623, 659],
+    'temperature': [4528, 4480, 4480, 4480, 4480],
 }

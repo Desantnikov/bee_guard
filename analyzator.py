@@ -33,13 +33,16 @@ class Analyzator:
 
 
     def describe_packets(self):
-        described_packets = self.packets_df.describe(percentiles=[0.03, 0.95]).transpose()
+        described_packets = self.packets_df.describe(percentiles=[]).transpose(copy=True).reset_index()
+
         del(described_packets['count'])
         del(described_packets['50%'])
+        del(described_packets['mean'])
+        del (described_packets['std'])
 
-        described_packets.columns = ['min', 'max', 'mean', 'std', '3%', '95%']
+        described_packets.columns = ['index', 'min', 'max']
 
         print(f'DESCRIBE:\r\n{described_packets}\r\n')
-
+        # print(f'Packets amount: {len(self.packets_df)}\r\nMin:\r\n{self.min}\r\n\r\nMax:\r\n{self.max}\r\n\r\n')
 
 
