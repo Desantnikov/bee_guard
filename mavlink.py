@@ -40,7 +40,7 @@ class Mavlink:
 
         packet_dicts_batch = []
 
-        for packets_counter in range(packets_amount):
+        for packets_counter in range(1, packets_amount+1):
             packet_dicts_batch.append(
                 self.receive_packet_dict(
                     packet_type=packet_type,
@@ -48,8 +48,8 @@ class Mavlink:
                 ),
             )
 
-            # if packets_counter % 10 == 0:
-            print(f'Received {packets_counter}th packet')
+            if packets_counter % 10 == 0:
+                print(f'Received {packets_counter}th packet')
             # print(f'Packet:\r\n{packet_dicts_batch[-1]}')
 
         total_time = time.time() - start_time

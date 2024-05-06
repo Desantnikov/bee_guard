@@ -9,6 +9,8 @@ pyserial = "*"
 pymavlink = "*"
 multiwii = "*"
 pandas = "*"
+pyaudio = "*"
+pysine = "*"
 
 [dev-packages]
 
