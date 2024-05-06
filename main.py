@@ -1,98 +1,93 @@
 import time
+
 from pymavlink import mavutil
-from example_packets_dataframe import EXAMPLE_DATAFRAME_INITIAL, EXAMPLE_DATAFRAME_ALARM
-from mavlink import Mavlink
-import threading
+
+import constants
+from constants import MAVLINK_SERIAL_PORT, MAVLINK_SERIAL_BAUDRATE, PACKETS_TO_COLLECT_WITHOUT_AUDIO, \
+    PACKETS_TO_COLLECT_WITH_AUDIO, RESET_INPUT_BUFFER, PACKET_TYPE_TO_ANALYZE, PACKET_TYPE_UPDATE_RATE_TO_REQUEST, \
+    INITIAL_AUDIO_FREQUENCY, AUDIO_FREQUENCY_LIMIT, AUDIO_FREQUENCY_STEP, USE_SAMPLE_PACKETS
+from mavlink_wrapper import MavlinkWrapper, FakeMavlinkWrapper
 from analyzer import Analyzer
-from audio import Audio
+from sound_controller import SoundController
 import pandas as pd
 
 
-MAVLINK_SERIAL_PORT = 'COM11'
-MAVLINK_SERIAL_BAUDRATE = 57600
-PACKETS_TO_COLLECT_WITHOUT_AUDIO = 100
-PACKETS_TO_COLLECT_WITH_AUDIO = 10
-USE_EXAMPLE_PACKETS = False
-RESET_INPUT_BUFFER = False
-PACKET_TYPE_TO_ANALYZE = 'RAW_IMU'  # MAVLINK_MSG_ID_HIGHRES_IMU
-PACKET_TYPE_UPDATE_RATE_TO_REQUEST = 5
-
-INITIAL_AUDIO_FREQUENCY = 1400
-AUDIO_FREQUENCY_LIMIT = 1500
-AUDIO_FREQUENCY_STEP = 50
-
-
+# TODO: Move to config
 pd.set_option('display.max_colwidth', None)
 pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option('display.float_format', lambda x: '%.2f' % x)
 
-
-if USE_EXAMPLE_PACKETS:
-    no_audio_packets = EXAMPLE_DATAFRAME_INITIAL
-else:
-    mavlink = Mavlink(
-        serial_port=MAVLINK_SERIAL_PORT,
-        baudrate=MAVLINK_SERIAL_BAUDRATE,
-        # to exclude when packet converted to dict
-        default_exclude_fields=['mavpackettype', 'time_usec', 'id', 'xmag', 'ymag', 'zmag'],
-        reset_input_buffer=RESET_INPUT_BUFFER,
-    )
-    mavlink.connection.setup_logfile('./mavlink_logs.log')
-    mavlink.request_message_interval(message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU, frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST)
-    
-    no_audio_packets = mavlink.receive_multiple_packet_dicts(packet_type=PACKET_TYPE_TO_ANALYZE, packets_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO)
-
-no_sound_packets_analyzator = Analyzer(packets=no_audio_packets)
-no_sound_packets_analyzator.describe_packets()
-
-# Extra attention to yaw (z axis)
-def enable_audio_receive_packets_and_check(audio_frequency: int) -> pd.DataFrame:  # TODO: Fix
-
-    # time.sleep(1)  # audio does not play instantly
-    if USE_EXAMPLE_PACKETS:
-        audio_packets = EXAMPLE_DATAFRAME_ALARM
-    else:
-        audio_duration = int(
-            (PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)  # TODO: move to Audio class
-
-        audio_thread = threading.Thread(target=Audio.play_sound,
-                                        kwargs={'frequency': audio_frequency, 'duration': audio_duration})
-        audio_thread.start()
-        audio_packets = mavlink.receive_multiple_packet_dicts(packet_type=PACKET_TYPE_TO_ANALYZE, packets_amount=PACKETS_TO_COLLECT_WITH_AUDIO)
-
-    # TODO: Store somewhere
-    audio_packets_analyzer = Analyzer(audio_packets)
-    audio_packets_analyzer.describe_packets()
-
-    rows_with_anomalies = no_sound_packets_analyzator.check_anomaly(input_df=pd.DataFrame(audio_packets))
-
-    if not USE_EXAMPLE_PACKETS:
-        audio_thread.join()
-
-    return rows_with_anomalies
+"""
+Flow:
+0. Select real or fake mavlink wrapper
+1. Collect reference packets (sound disabled)
+2. In thread - start sound with specific frequency
+3. Read packets influenced (probably) by the audio playback
+4. Wait until playback thread finished
+5. Increase current frequency
+5. GOTO [2]
+"""
 
 
-results = []#{}
+
+
+mavlink_wrapper_cls = MavlinkWrapper
+if USE_SAMPLE_PACKETS:  # use fake wrapper returning sample data if enabled
+    mavlink_wrapper_cls = FakeMavlinkWrapper
+
+
+mavlink_wrapper = mavlink_wrapper_cls(
+    serial_port=MAVLINK_SERIAL_PORT,
+    baudrate=MAVLINK_SERIAL_BAUDRATE,
+    default_exclude_fields=['mavpackettype', 'id', 'xmag', 'ymag', 'zmag'],  # TODO: Move to constants?
+    do_reset_input_buffer=RESET_INPUT_BUFFER,
+)
+mavlink_wrapper.request_message_interval(  # set RAW_IMU message update frequency
+    message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
+    frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
+)
+reference_packet_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read first X packets to use as a reference
+    packet_type=PACKET_TYPE_TO_ANALYZE,
+    packets_read_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO,
+)
+
+main_analyzer = Analyzer(packets_dicts=reference_packet_dicts)
+
 
 current_audio_frequency = INITIAL_AUDIO_FREQUENCY
 while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
-    anomalies = enable_audio_receive_packets_and_check(audio_frequency=current_audio_frequency)
+    print(f'Start {current_audio_frequency}Hz test:\r\n'
+          f'---------------------------------------------')
+    SoundController.playback_start_threaded(frequency=current_audio_frequency)  # audio playback in separate thread
+    time.sleep(1)  # wait for playback to start
 
-    if not anomalies.empty:
-        print(f'Found {len(anomalies)} anomalies for frequency: {current_audio_frequency}\r\n')
-        results[current_audio_frequency] = anomalies
+    packets_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read X packets to use as a reference
+        packet_type=PACKET_TYPE_TO_ANALYZE,
+        packets_read_amount=PACKETS_TO_COLLECT_WITH_AUDIO,
+    )
+    main_analyzer.append_packets(packets_dicts=packets_dicts)
+
+    while SoundController.playback_thread is not None:
+        # print(f'Wait for playback to finish')
+        time.sleep(1)
 
     current_audio_frequency += AUDIO_FREQUENCY_STEP
 
+
 print(f'\r\n'
       f'Anomalies:\r\n'
-      f'----------------------------------------------------------\r\n')
+      f'----------------------------------------------------------\r\n'
+      f'{main_analyzer.describe_packets()}')
 
-for frequency, anomalies_df in results.items():
-    print(f'Frequency {frequency} anomalies:\r\n'
-          f'{anomalies_df}\r\n')
 
+
+
+# for frequency, anomalies_df in results.items():
+#     print(f'Frequency {frequency} anomalies:\r\n'
+#           f'{anomalies_df}\r\n')
+#
 print('SSSSSS')
 
 

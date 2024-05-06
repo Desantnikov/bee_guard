@@ -1,20 +1,31 @@
 import pyaudio
 import struct
 import math
+import threading
+from constants import USE_SAMPLE_PACKETS
 
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 192000
+from constants import FORMAT, CHANNELS, RATE, PACKETS_TO_COLLECT_WITH_AUDIO, PACKET_TYPE_UPDATE_RATE_TO_REQUEST
 
 
-class Audio:
-    p = pyaudio.PyAudio()
+class SoundController:
+    pyaudio_instance = pyaudio.PyAudio()
+    playback_thread = None
 
     @classmethod
-    def play_sound(cls, frequency: int, duration: int):
+    def playback_start_threaded(cls, frequency: int, duration: int = None):
+        if USE_SAMPLE_PACKETS:  # skip playback if using not real data
+            return
 
-        frames = cls.data_for_freq(frequency, duration)
-        stream = cls.p.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
+        if duration is None:
+            duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
+
+        cls.playback_thread = threading.Thread(target=cls._playback_start, kwargs={'frequency': frequency, 'duration': duration})
+        cls.playback_thread.start()
+
+    @classmethod
+    def _playback_start(cls, frequency: int, duration: int):   # blocking, should be ued inside separate thread
+        frames = cls._data_for_freq(frequency, duration)
+        stream = cls.pyaudio_instance.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
 
         print(f'Start playing sound {frequency} Hz')
         stream.write(frames)
@@ -22,8 +33,10 @@ class Audio:
         stream.close()
         print(f'Stop playing sound {frequency} Hz')
 
+        cls.playback_thread = None  # use it as a flag to check if thread is finished
+
     @staticmethod
-    def data_for_freq(frequency: float, time: float = None):
+    def _data_for_freq(frequency: float, time: float = None):
         """get frames for a fixed frequency for a specified time or
         number of frames, if frame_count is specified, the specified
         time is ignored"""
@@ -71,4 +84,4 @@ if __name__ == "__main__":
     FREQUENCY = 21000
     DURATION = 5
 
-    Audio.play_sound(frequency=FREQUENCY, duration=DURATION)
+    SoundController._playback_start(frequency=FREQUENCY, duration=DURATION)

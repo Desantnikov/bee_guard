@@ -1,24 +1,28 @@
 import time
+from constants import SAMPLE_DATA_PATH
+
+import pandas as pd
 from pymavlink import mavutil
 
 from typing import List
 
 
 
-class Mavlink:
+class MavlinkWrapper:
     # https://www.ardusub.com/developers/pymavlink.html#autopilot-eg-pixhawk-connected-to-the-computer-via-serial
-    def __init__(self, serial_port: str, baudrate: int = 57600, default_exclude_fields: List[str] = None, reset_input_buffer: bool = True):
+    def __init__(self, serial_port: str, baudrate: int = 57600, default_exclude_fields: List[str] = None, do_reset_input_buffer: bool = True):
         self.connection = mavutil.mavlink_connection(serial_port, baud=baudrate)
         self.connection.wait_heartbeat(blocking=True, timeout=15)
-        print(f'Connected to mavlink')
+        print(f'Connected to mavlink_wrapper')
 
         self.default_exclude_fields = default_exclude_fields
-        self.RESET_INPUT_BUFFER = reset_input_buffer
+        self.do_reset_input_buffer = do_reset_input_buffer
+        self.connection.setup_logfile('./mavlink_logs.log')
 
     def receive_packet_dict(self, packet_type: str = None, blocking: bool = True, exclude_fields: List[str] = None):
         packet = self.connection.recv_match(type=packet_type, blocking=blocking)
 
-        # print(f'Mav count: {self.connection.mav_count}. Packet utime: {packet.time_usec}')
+        # print(f'Mav count: {cls.connection.mav_count}. Packet utime: {packet.time_usec}')
 
         packet_dict = packet.to_dict()
 
@@ -31,16 +35,16 @@ class Mavlink:
 
         return packet_dict
 
-    def receive_multiple_packet_dicts(self, packet_type: str = None, packets_amount: int = 0):
+    def receive_multiple_packet_dicts(self, packet_type: str = None, packets_read_amount: int = 0):
         start_time = time.time()
 
-        if self.RESET_INPUT_BUFFER:
+        if self.do_reset_input_buffer:
             print(f'\r\nResetting input buffer')
             self.connection.port.reset_input_buffer()
 
         packet_dicts_batch = []
 
-        for packets_counter in range(1, packets_amount+1):
+        for packets_counter in range(1, packets_read_amount + 1):
             packet_dicts_batch.append(
                 self.receive_packet_dict(
                     packet_type=packet_type,
@@ -77,3 +81,28 @@ class Mavlink:
             0,
             # Target address of message stream (if message has target address fields). 0: Flight-stack default (recommended), 1: address of requestor, 2: broadcast.
         )
+
+
+class FakeMavlinkWrapper(MavlinkWrapper):
+    def __init__(self, *args, **kwargs):
+        reference_packet_dicts = self._read_sample_data('100_RAW_IMU_reference_packets.csv').to_dict()
+        influenced_packet_dicts = self._read_sample_data('10_RAW_IMU_anomaly_packets.csv').to_dict()
+
+        # pop one by one when `receive_multiple_packet_dicts` executed
+        self.packets_batches_queue = [reference_packet_dicts] + [influenced_packet_dicts for _ in range(50)]
+
+        print(f'Fake mavlink wrapper initialized')
+
+    @staticmethod
+    def _read_sample_data(filename):
+        return pd.read_csv(f'{SAMPLE_DATA_PATH}/{filename}')
+
+    def receive_multiple_packet_dicts(self, *args, **kwargs):
+        print(f'Return fake packet dicts')
+
+        return self.packets_batches_queue.pop(0)
+
+    def request_message_interval(self, *args, **kwargs):
+        pass
+
+

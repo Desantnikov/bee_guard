@@ -1,4 +1,4 @@
-EXAMPLE_DATAFRAME_INITIAL = {  # 20 packets
+EXAMPLE_DATAFRAME_INITIAL = {  # 20 packets_dicts
     'xacc': [22, 22, 22, 22, 22, 22, 21, 22, 21, 21, 22, 21, 22, 22, 22, 22, -121, -149, -68, -81],
     'yacc': [-67, -67, -67, -66, -67, -67, -66, -67, -67, -67, -66, -67, -67, -67, -67, -67, 430, 465, 667, 732],
     'zacc': [-999, -999, -999, -999, -999, -999, -998, -999, -999, -999, -999, -999, -999, -999, -999, -999, -1161, 699,
@@ -13,7 +13,7 @@ EXAMPLE_DATAFRAME_INITIAL = {  # 20 packets
                     4480, 4480, 4480, 4528],
 }
 
-EXAMPLE_DATAFRAME_ALARM = {  # 5 packets with one with xgyro -10000
+EXAMPLE_DATAFRAME_ALARM = {  # 5 packets_dicts with one with xgyro -10000
     'xacc': [22, 22, 22, 22, 22],
     'yacc': [-67, -67, -67, -66, -67],
     'zacc': [-999, -999, -999, -999, -999],
