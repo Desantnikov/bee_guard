@@ -79,7 +79,9 @@ while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
 print(f'\r\n'
       f'Anomalies:\r\n'
       f'----------------------------------------------------------\r\n'
-      f'{main_analyzer.describe_packets()}')
+      f'{main_analyzer.describe_packets()}\r\n\r\n')
+
+print(f'Z-Score outliners:\r\n{main_analyzer.calc_zscore_outliners()}')
 
 
 

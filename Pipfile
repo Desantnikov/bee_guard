@@ -11,6 +11,7 @@ multiwii = "*"
 pandas = "*"
 pyaudio = "*"
 pysine = "*"
+scipy = "*"
 
 [dev-packages]
 
