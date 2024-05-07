@@ -10,6 +10,7 @@ from constants import FORMAT, CHANNELS, RATE, PACKETS_TO_COLLECT_WITH_AUDIO, PAC
 class SoundController:
     pyaudio_instance = pyaudio.PyAudio()
     playback_thread = None
+    stream = pyaudio_instance.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
 
     @classmethod
     def playback_start_threaded(cls, frequency: int, duration: int = None):
@@ -25,12 +26,11 @@ class SoundController:
     @classmethod
     def _playback_start(cls, frequency: int, duration: int):   # blocking, should be ued inside separate thread
         frames = cls._data_for_freq(frequency, duration)
-        stream = cls.pyaudio_instance.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
+        stream = cls.stream
 
         print(f'Start playing sound {frequency} Hz')
         stream.write(frames)
-        stream.stop_stream()
-        stream.close()
+
         print(f'Stop playing sound {frequency} Hz')
 
         cls.playback_thread = None  # use it as a flag to check if thread is finished

@@ -12,6 +12,7 @@ pandas = "*"
 pyaudio = "*"
 pysine = "*"
 scipy = "*"
+matplotlib = "*"
 
 [dev-packages]
 

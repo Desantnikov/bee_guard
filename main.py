@@ -31,67 +31,70 @@ Flow:
 """
 
 
+try:
+
+    mavlink_wrapper_cls = MavlinkWrapper
+    if USE_SAMPLE_PACKETS:  # use fake wrapper returning sample data if enabled
+        mavlink_wrapper_cls = FakeMavlinkWrapper
 
 
-mavlink_wrapper_cls = MavlinkWrapper
-if USE_SAMPLE_PACKETS:  # use fake wrapper returning sample data if enabled
-    mavlink_wrapper_cls = FakeMavlinkWrapper
-
-
-mavlink_wrapper = mavlink_wrapper_cls(
-    serial_port=MAVLINK_SERIAL_PORT,
-    baudrate=MAVLINK_SERIAL_BAUDRATE,
-    default_exclude_fields=['mavpackettype', 'id', 'xmag', 'ymag', 'zmag'],  # TODO: Move to constants?
-    do_reset_input_buffer=RESET_INPUT_BUFFER,
-)
-mavlink_wrapper.request_message_interval(  # set RAW_IMU message update frequency
-    message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
-    frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
-)
-reference_packet_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read first X packets to use as a reference
-    packet_type=PACKET_TYPE_TO_ANALYZE,
-    packets_read_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO,
-)
-
-main_analyzer = Analyzer(packets_dicts=reference_packet_dicts)
-
-
-current_audio_frequency = INITIAL_AUDIO_FREQUENCY
-while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
-    print(f'Start {current_audio_frequency}Hz test:\r\n'
-          f'---------------------------------------------')
-    SoundController.playback_start_threaded(frequency=current_audio_frequency)  # audio playback in separate thread
-    time.sleep(1)  # wait for playback to start
-
-    packets_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read X packets to use as a reference
-        packet_type=PACKET_TYPE_TO_ANALYZE,
-        packets_read_amount=PACKETS_TO_COLLECT_WITH_AUDIO,
+    mavlink_wrapper = mavlink_wrapper_cls(
+        serial_port=MAVLINK_SERIAL_PORT,
+        baudrate=MAVLINK_SERIAL_BAUDRATE,
+        default_exclude_fields=['mavpackettype', 'id', 'xmag', 'ymag', 'zmag'],  # TODO: Move to constants?
+        do_reset_input_buffer=RESET_INPUT_BUFFER,
     )
-    main_analyzer.append_packets(packets_dicts=packets_dicts)
+    mavlink_wrapper.request_message_interval(  # set RAW_IMU message update frequency
+        message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
+        frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
+    )
+    reference_packet_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read first X packets to use as a reference
+        packet_type=PACKET_TYPE_TO_ANALYZE,
+        packets_read_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO,
+    )
 
-    while SoundController.playback_thread is not None:
-        # print(f'Wait for playback to finish')
-        time.sleep(1)
-
-    current_audio_frequency += AUDIO_FREQUENCY_STEP
-
-
-print(f'\r\n'
-      f'Anomalies:\r\n'
-      f'----------------------------------------------------------\r\n'
-      f'{main_analyzer.describe_packets()}\r\n\r\n')
-
-print(f'Z-Score outliners:\r\n{main_analyzer.calc_zscore_outliners()}')
+    main_analyzer = Analyzer(packets_dicts=reference_packet_dicts)
 
 
+    current_audio_frequency = INITIAL_AUDIO_FREQUENCY
+    while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
+        mavlink_wrapper.clear_input_buffer()  # clear all input packets before iteration
+
+        print(f'Start {current_audio_frequency}Hz test:\r\n'
+              f'---------------------------------------------')
+        SoundController.playback_start_threaded(frequency=current_audio_frequency)  # audio playback in separate thread
+        time.sleep(1)  # wait for playback to start
+
+        packets_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read X packets to use as a reference
+            packet_type=PACKET_TYPE_TO_ANALYZE,
+            packets_read_amount=PACKETS_TO_COLLECT_WITH_AUDIO,
+        )
+        main_analyzer.append_packets(packets_dicts=packets_dicts)
+        main_analyzer.update_frequency_col(frequency=current_audio_frequency)
+
+        while SoundController.playback_thread is not None:
+            # print(f'Wait for playback to finish')
+            time.sleep(1)
+
+        current_audio_frequency += AUDIO_FREQUENCY_STEP
 
 
-# for frequency, anomalies_df in results.items():
-#     print(f'Frequency {frequency} anomalies:\r\n'
-#           f'{anomalies_df}\r\n')
-#
-breakpoint()
-print('SSSSSS')
+    print(f'\r\n'
+          f'Anomalies:\r\n'
+          f'----------------------------------------------------------\r\n'
+          f'{main_analyzer.describe_packets()}\r\n\r\n')
 
+    print(f'Z-Score outliners:\r\n{main_analyzer.calc_zscore_outliners()}')
+
+    main_analyzer.show_plot()
+    main_analyzer.packets_df.to_csv('last_run_dataframe.csv')
+
+    breakpoint()
+    print('SSSSSS')
+
+except Exception as e:
+    print('asdasdasdsa')
+    breakpoint()
+    print('asdasdasd')
 
 

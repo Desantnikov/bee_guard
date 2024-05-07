@@ -20,7 +20,7 @@ class MavlinkWrapper:
         self.connection.setup_logfile('./mavlink_logs.log')
 
     def receive_packet_dict(self, packet_type: str = None, blocking: bool = True, exclude_fields: List[str] = None):
-        packet = self.connection.recv_match(type=packet_type, blocking=blocking)
+        packet = self.connection.recv_match(type=packet_type, blocking=blocking, timeout=30)
 
         # print(f'Mav count: {cls.connection.mav_count}. Packet utime: {packet.time_usec}')
 
@@ -82,6 +82,11 @@ class MavlinkWrapper:
             # Target address of message stream (if message has target address fields). 0: Flight-stack default (recommended), 1: address of requestor, 2: broadcast.
         )
 
+    def clear_input_buffer(self):
+        received = True
+        while received:
+            received = self.connection.recv_msg()
+
 
 class FakeMavlinkWrapper(MavlinkWrapper):
     def __init__(self, *args, **kwargs):
@@ -105,4 +110,6 @@ class FakeMavlinkWrapper(MavlinkWrapper):
     def request_message_interval(self, *args, **kwargs):
         pass
 
+    def clear_input_buffer(self):
+        pass
 

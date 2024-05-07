@@ -19,161 +19,794 @@ Received 170th packet
 Received 180th packet
 Received 190th packet
 Received 200th packet
-Total received packets: 200. Time: 39.76970839500427
-Start 1700Hz test:
+Total received packets: 200. Time: 39.600701570510864
+Start 10Hz test:
 ---------------------------------------------
+Start playing sound 10 Hz
 Received 10th packet
-Start playing sound 1700 Hz
 Received 20th packet
-Received 30th packet
-Received 40th packet
-Received 50th packet
-Total received packets: 50. Time: 8.974969863891602
+Total received packets: 25. Time: 4.012887477874756
 
 Packets amount: 200
+Packets amount after concat: 225
+
+Stop playing sound 10 Hz
+Start 35Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 35 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.814485549926758
+
+Packets amount: 225
 Packets amount after concat: 250
 
-Stop playing sound 1700 Hz
-Start 1750Hz test:
+Stop playing sound 35 Hz
+Start 60Hz test:
 ---------------------------------------------
-Received 10th packet
-Received 20th packet
-Received 30th packet
-Received 40th packetStart playing sound 1750 Hz
+Received 10th packetStart playing sound 60 Hz
 
-Received 50th packet
-Total received packets: 50. Time: 2.9584453105926514
+Received 20th packet
+Total received packets: 25. Time: 3.739049196243286
 
 Packets amount: 250
+Packets amount after concat: 275
+
+Stop playing sound 60 Hz
+Start 85Hz test:
+---------------------------------------------
+Start playing sound 85 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.73691987991333
+
+Packets amount: 275
 Packets amount after concat: 300
 
-Stop playing sound 1750 Hz
-Start 1800Hz test:
+Stop playing sound 85 Hz
+Start 110Hz test:
 ---------------------------------------------
 Received 10th packet
+Start playing sound 110 Hz
 Received 20th packet
-Received 30th packet
-Received 40th packet
-Start playing sound 1800 Hz
-Received 50th packet
-Total received packets: 50. Time: 2.5766806602478027
+Total received packets: 25. Time: 3.7579357624053955
 
 Packets amount: 300
+Packets amount after concat: 325
+
+Stop playing sound 110 Hz
+Start 135Hz test:
+---------------------------------------------
+Start playing sound 135 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9661471843719482
+
+Packets amount: 325
 Packets amount after concat: 350
 
-Stop playing sound 1800 Hz
-Start 1850Hz test:
+Stop playing sound 135 Hz
+Start 160Hz test:
 ---------------------------------------------
+Start playing sound 160 Hz
 Received 10th packet
 Received 20th packet
-Received 30th packet
-Received 40th packet
-Start playing sound 1850 Hz
-Received 50th packet
-Total received packets: 50. Time: 2.563400983810425
+Total received packets: 25. Time: 3.9391489028930664
 
 Packets amount: 350
+Packets amount after concat: 375
+
+Stop playing sound 160 Hz
+Start 185Hz test:
+---------------------------------------------
+Start playing sound 185 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.902282953262329
+
+Packets amount: 375
 Packets amount after concat: 400
 
-Stop playing sound 1850 Hz
-Start 1900Hz test:
+Stop playing sound 185 Hz
+Start 210Hz test:
 ---------------------------------------------
 Received 10th packet
+Start playing sound 210 Hz
 Received 20th packet
-Received 30th packet
-Start playing sound 1900 Hz
-Received 40th packet
-Received 50th packet
-Total received packets: 50. Time: 2.5761067867279053
+Total received packets: 25. Time: 3.8517346382141113
 
 Packets amount: 400
+Packets amount after concat: 425
+
+Stop playing sound 210 Hz
+Start 235Hz test:
+---------------------------------------------
+Start playing sound 235 HzReceived 10th packet
+
+Received 20th packet
+Total received packets: 25. Time: 3.928473949432373
+
+Packets amount: 425
 Packets amount after concat: 450
 
-Stop playing sound 1900 Hz
-Start 1950Hz test:
+Stop playing sound 235 Hz
+Start 260Hz test:
 ---------------------------------------------
 Received 10th packet
+Start playing sound 260 Hz
 Received 20th packet
-Received 30th packet
-Received 40th packet
-Start playing sound 1950 Hz
-Received 50th packet
-Total received packets: 50. Time: 2.5536792278289795
+Total received packets: 25. Time: 3.9436874389648438
 
 Packets amount: 450
-Packets amount after concat: 500
+Packets amount after concat: 475
 
-Stop playing sound 1950 Hz
-Start 2000Hz test:
+Stop playing sound 260 Hz
+Start 285Hz test:
 ---------------------------------------------
 Received 10th packet
+Start playing sound 285 Hz
 Received 20th packet
-Received 30th packet
-Start playing sound 2000 Hz
-Received 40th packet
-Received 50th packet
-Total received packets: 50. Time: 2.590832471847534
+Total received packets: 25. Time: 3.944113254547119
+
+Packets amount: 475
+Packets amount after concat: 500
+
+Stop playing sound 285 Hz
+Start 310Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 310 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.787914752960205
 
 Packets amount: 500
+Packets amount after concat: 525
+
+Stop playing sound 310 Hz
+Start 335Hz test:
+---------------------------------------------
+Start playing sound 335 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9575536251068115
+
+Packets amount: 525
 Packets amount after concat: 550
 
-Stop playing sound 2000 Hz
-Described: 
-          time_usec   xacc   yacc     zacc  xgyro  ygyro  zgyro  temperature
-count        550.00 550.00 550.00   550.00 550.00 550.00 550.00       550.00
-mean  2355261285.97  -0.05 -11.74 -1001.90 -14.68  -1.94   0.02      4503.56
-std     32698265.38   0.39   0.68     0.57   1.75   1.56   0.74        24.02
-min   2299804859.00  -4.00 -17.00 -1003.00 -20.00  -8.00  -2.00      4480.00
-25%   2327254892.50   0.00 -12.00 -1002.00 -16.00  -3.00   0.00      4480.00
-50%   2354704877.50   0.00 -12.00 -1002.00 -15.00  -2.00   0.00      4480.00
-75%   2382154898.50   0.00 -11.00 -1002.00 -14.00  -1.00   0.00      4528.00
-max   2421604858.00   4.00  -7.00 -1000.00  -9.00   2.00   3.00      4528.00
+Stop playing sound 335 Hz
+Start 360Hz test:
+---------------------------------------------
+Start playing sound 360 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8924436569213867
 
+Packets amount: 550
+Packets amount after concat: 575
 
-Rolling standard deviatio for each value:
-time_usec     32698265.38
-xacc                 0.39
-yacc                 0.68
-zacc                 0.57
-xgyro                1.75
-ygyro                1.56
-zgyro                0.74
-temperature         24.02
-dtype: float64
+Stop playing sound 360 Hz
+Start 385Hz test:
+---------------------------------------------
+Start playing sound 385 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9667060375213623
 
-Anomalies:
-----------------------------------------------------------
-None
+Packets amount: 575
+Packets amount after concat: 600
 
+Stop playing sound 385 Hz
+Start 410Hz test:
+---------------------------------------------
+Start playing sound 410 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8251421451568604
 
-Z-Score outliners:
-     time_usec  xacc   yacc     zacc  xgyro  ygyro  zgyro  temperature
-0          NaN -2.00  -9.00      NaN    NaN    NaN    NaN          NaN
-2          NaN   NaN -17.00      NaN    NaN    NaN    NaN          NaN
-3          NaN  2.00 -15.00      NaN    NaN    NaN    NaN          NaN
-5          NaN -2.00  -7.00      NaN    NaN    NaN    NaN          NaN
-6          NaN   NaN  -9.00      NaN    NaN    NaN    NaN          NaN
-8          NaN   NaN -14.00      NaN    NaN    NaN    NaN          NaN
-34         NaN   NaN    NaN      NaN    NaN  -7.00    NaN          NaN
-35         NaN  4.00    NaN      NaN    NaN    NaN    NaN          NaN
-36         NaN -4.00 -14.00 -1000.00    NaN    NaN    NaN          NaN
-37         NaN -3.00    NaN -1000.00    NaN    NaN    NaN          NaN
-38         NaN   NaN  -9.00      NaN    NaN    NaN    NaN          NaN
-39         NaN   NaN    NaN      NaN -20.00    NaN    NaN          NaN
-43         NaN   NaN  -9.00      NaN    NaN    NaN    NaN          NaN
-56         NaN -2.00    NaN      NaN    NaN    NaN    NaN          NaN
-57         NaN   NaN -14.00      NaN    NaN    NaN    NaN          NaN
-123        NaN   NaN    NaN -1000.00    NaN    NaN    NaN          NaN
-151        NaN   NaN    NaN      NaN    NaN  -8.00    NaN          NaN
-249        NaN   NaN    NaN      NaN    NaN  -7.00    NaN          NaN
-252        NaN   NaN    NaN      NaN    NaN  -7.00    NaN          NaN
-258        NaN   NaN    NaN -1000.00    NaN    NaN    NaN          NaN
-329        NaN   NaN    NaN -1000.00    NaN    NaN    NaN          NaN
-390        NaN   NaN    NaN      NaN    NaN    NaN   3.00          NaN
-391        NaN   NaN    NaN      NaN    NaN  -7.00    NaN          NaN
-397        NaN   NaN    NaN      NaN  -9.00    NaN    NaN          NaN
-464        NaN   NaN    NaN      NaN    NaN    NaN   3.00          NaN
+Packets amount: 600
+Packets amount after concat: 625
+
+Stop playing sound 410 Hz
+Start 435Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 435 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9339263439178467
+
+Packets amount: 625
+Packets amount after concat: 650
+
+Stop playing sound 435 Hz
+Start 460Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 460 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9419736862182617
+
+Packets amount: 650
+Packets amount after concat: 675
+
+Stop playing sound 460 Hz
+Start 485Hz test:
+---------------------------------------------
+Start playing sound 485 HzReceived 10th packet
+
+Received 20th packet
+Total received packets: 25. Time: 3.947049140930176
+
+Packets amount: 675
+Packets amount after concat: 700
+
+Stop playing sound 485 Hz
+Start 510Hz test:
+---------------------------------------------
+Start playing sound 510 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8586366176605225
+
+Packets amount: 700
+Packets amount after concat: 725
+
+Stop playing sound 510 Hz
+Start 535Hz test:
+---------------------------------------------
+Start playing sound 535 HzReceived 10th packet
+
+Received 20th packet
+Total received packets: 25. Time: 3.9077279567718506
+
+Packets amount: 725
+Packets amount after concat: 750
+
+Stop playing sound 535 Hz
+Start 560Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 560 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9792139530181885
+
+Packets amount: 750
+Packets amount after concat: 775
+
+Stop playing sound 560 Hz
+Start 585Hz test:
+---------------------------------------------
+Received 10th packetStart playing sound 585 Hz
+
+Received 20th packet
+Total received packets: 25. Time: 3.9057130813598633
+
+Packets amount: 775
+Packets amount after concat: 800
+
+Stop playing sound 585 Hz
+Start 610Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 610 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.8243744373321533
+
+Packets amount: 800
+Packets amount after concat: 825
+
+Stop playing sound 610 Hz
+Start 635Hz test:
+---------------------------------------------
+Start playing sound 635 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.901642322540283
+
+Packets amount: 825
+Packets amount after concat: 850
+
+Stop playing sound 635 Hz
+Start 660Hz test:
+---------------------------------------------
+Start playing sound 660 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.956512451171875
+
+Packets amount: 850
+Packets amount after concat: 875
+
+Stop playing sound 660 Hz
+Start 685Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 685 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.940211057662964
+
+Packets amount: 875
+Packets amount after concat: 900
+
+Stop playing sound 685 Hz
+Start 710Hz test:
+---------------------------------------------
+Start playing sound 710 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.7715063095092773
+
+Packets amount: 900
+Packets amount after concat: 925
+
+Stop playing sound 710 Hz
+Start 735Hz test:
+---------------------------------------------
+Start playing sound 735 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9243600368499756
+
+Packets amount: 925
+Packets amount after concat: 950
+
+Stop playing sound 735 Hz
+Start 760Hz test:
+---------------------------------------------
+Start playing sound 760 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.935539722442627
+
+Packets amount: 950
+Packets amount after concat: 975
+
+Stop playing sound 760 Hz
+Start 785Hz test:
+---------------------------------------------
+Start playing sound 785 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8402721881866455
+
+Packets amount: 975
+Packets amount after concat: 1000
+
+Stop playing sound 785 Hz
+Start 810Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 810 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9337499141693115
+
+Packets amount: 1000
+Packets amount after concat: 1025
+
+Stop playing sound 810 Hz
+Start 835Hz test:
+---------------------------------------------
+Start playing sound 835 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.911525011062622
+
+Packets amount: 1025
+Packets amount after concat: 1050
+
+Stop playing sound 835 Hz
+Start 860Hz test:
+---------------------------------------------
+Start playing sound 860 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9432029724121094
+
+Packets amount: 1050
+Packets amount after concat: 1075
+
+Stop playing sound 860 Hz
+Start 885Hz test:
+---------------------------------------------
+Start playing sound 885 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8121469020843506
+
+Packets amount: 1075
+Packets amount after concat: 1100
+
+Stop playing sound 885 Hz
+Start 910Hz test:
+---------------------------------------------
+Start playing sound 910 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9497482776641846
+
+Packets amount: 1100
+Packets amount after concat: 1125
+
+Stop playing sound 910 Hz
+Start 935Hz test:
+---------------------------------------------
+Start playing sound 935 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9257168769836426
+
+Packets amount: 1125
+Packets amount after concat: 1150
+
+Stop playing sound 935 Hz
+Start 960Hz test:
+---------------------------------------------
+Start playing sound 960 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9467148780822754
+
+Packets amount: 1150
+Packets amount after concat: 1175
+
+Stop playing sound 960 Hz
+Start 985Hz test:
+---------------------------------------------
+Start playing sound 985 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8754615783691406
+
+Packets amount: 1175
+Packets amount after concat: 1200
+
+Stop playing sound 985 Hz
+Start 1010Hz test:
+---------------------------------------------
+Start playing sound 1010 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8822340965270996
+
+Packets amount: 1200
+Packets amount after concat: 1225
+
+Stop playing sound 1010 Hz
+Start 1035Hz test:
+---------------------------------------------
+Start playing sound 1035 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.751404285430908
+
+Packets amount: 1225
+Packets amount after concat: 1250
+
+Stop playing sound 1035 Hz
+Start 1060Hz test:
+---------------------------------------------
+Start playing sound 1060 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.870940923690796
+
+Packets amount: 1250
+Packets amount after concat: 1275
+
+Stop playing sound 1060 Hz
+Start 1085Hz test:
+---------------------------------------------
+Start playing sound 1085 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9719154834747314
+
+Packets amount: 1275
+Packets amount after concat: 1300
+
+Stop playing sound 1085 Hz
+Start 1110Hz test:
+---------------------------------------------
+Start playing sound 1110 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.859029531478882
+
+Packets amount: 1300
+Packets amount after concat: 1325
+
+Stop playing sound 1110 Hz
+Start 1135Hz test:
+---------------------------------------------
+Start playing sound 1135 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.939150810241699
+
+Packets amount: 1325
+Packets amount after concat: 1350
+
+Stop playing sound 1135 Hz
+Start 1160Hz test:
+---------------------------------------------
+Start playing sound 1160 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.93822979927063
+
+Packets amount: 1350
+Packets amount after concat: 1375
+
+Stop playing sound 1160 Hz
+Start 1185Hz test:
+---------------------------------------------
+Start playing sound 1185 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9235684871673584
+
+Packets amount: 1375
+Packets amount after concat: 1400
+
+Stop playing sound 1185 Hz
+Start 1210Hz test:
+---------------------------------------------
+Start playing sound 1210 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.7870001792907715
+
+Packets amount: 1400
+Packets amount after concat: 1425
+
+Stop playing sound 1210 Hz
+Start 1235Hz test:
+---------------------------------------------
+Start playing sound 1235 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.792736530303955
+
+Packets amount: 1425
+Packets amount after concat: 1450
+
+Stop playing sound 1235 Hz
+Start 1260Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 1260 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9418957233428955
+
+Packets amount: 1450
+Packets amount after concat: 1475
+
+Stop playing sound 1260 Hz
+Start 1285Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 1285 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9162871837615967
+
+Packets amount: 1475
+Packets amount after concat: 1500
+
+Stop playing sound 1285 Hz
+Start 1310Hz test:
+---------------------------------------------
+Start playing sound 1310 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9506099224090576
+
+Packets amount: 1500
+Packets amount after concat: 1525
+
+Stop playing sound 1310 Hz
+Start 1335Hz test:
+---------------------------------------------
+Start playing sound 1335 HzReceived 10th packet
+
+Received 20th packet
+Total received packets: 25. Time: 3.855144739151001
+
+Packets amount: 1525
+Packets amount after concat: 1550
+
+Stop playing sound 1335 Hz
+Start 1360Hz test:
+---------------------------------------------
+Start playing sound 1360 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9458565711975098
+
+Packets amount: 1550
+Packets amount after concat: 1575
+
+Stop playing sound 1360 Hz
+Start 1385Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 1385 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.8839476108551025
+
+Packets amount: 1575
+Packets amount after concat: 1600
+
+Stop playing sound 1385 Hz
+Start 1410Hz test:
+---------------------------------------------
+Start playing sound 1410 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9365413188934326
+
+Packets amount: 1600
+Packets amount after concat: 1625
+
+Stop playing sound 1410 Hz
+Start 1435Hz test:
+---------------------------------------------
+Start playing sound 1435 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.883943557739258
+
+Packets amount: 1625
+Packets amount after concat: 1650
+
+Stop playing sound 1435 Hz
+Start 1460Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 1460 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.9492523670196533
+
+Packets amount: 1650
+Packets amount after concat: 1675
+
+Stop playing sound 1460 Hz
+Start 1485Hz test:
+---------------------------------------------
+Received 10th packet
+Start playing sound 1485 Hz
+Received 20th packet
+Total received packets: 25. Time: 3.867659568786621
+
+Packets amount: 1675
+Packets amount after concat: 1700
+
+Stop playing sound 1485 Hz
+Start 1510Hz test:
+---------------------------------------------
+Start playing sound 1510 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.791904926300049
+
+Packets amount: 1700
+Packets amount after concat: 1725
+
+Stop playing sound 1510 Hz
+Start 1535Hz test:
+---------------------------------------------
+Start playing sound 1535 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8747518062591553
+
+Packets amount: 1725
+Packets amount after concat: 1750
+
+Stop playing sound 1535 Hz
+Start 1560Hz test:
+---------------------------------------------
+Start playing sound 1560 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.812270402908325
+
+Packets amount: 1750
+Packets amount after concat: 1775
+
+Stop playing sound 1560 Hz
+Start 1585Hz test:
+---------------------------------------------
+Start playing sound 1585 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9105045795440674
+
+Packets amount: 1775
+Packets amount after concat: 1800
+
+Stop playing sound 1585 Hz
+Start 1610Hz test:
+---------------------------------------------
+Start playing sound 1610 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.957777261734009
+
+Packets amount: 1800
+Packets amount after concat: 1825
+
+Stop playing sound 1610 Hz
+Start 1635Hz test:
+---------------------------------------------
+Start playing sound 1635 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.796380043029785
+
+Packets amount: 1825
+Packets amount after concat: 1850
+
+Stop playing sound 1635 Hz
+Start 1660Hz test:
+---------------------------------------------
+Start playing sound 1660 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9612786769866943
+
+Packets amount: 1850
+Packets amount after concat: 1875
+
+Stop playing sound 1660 Hz
+Start 1685Hz test:
+---------------------------------------------
+Start playing sound 1685 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9416263103485107
+
+Packets amount: 1875
+Packets amount after concat: 1900
+
+Stop playing sound 1685 Hz
+Start 1710Hz test:
+---------------------------------------------
+Start playing sound 1710 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.959425449371338
+
+Packets amount: 1900
+Packets amount after concat: 1925
+
+Stop playing sound 1710 Hz
+Start 1735Hz test:
+---------------------------------------------
+Start playing sound 1735 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.8309950828552246
+
+Packets amount: 1925
+Packets amount after concat: 1950
+
+Stop playing sound 1735 Hz
+Start 1760Hz test:
+---------------------------------------------
+Start playing sound 1760 Hz
+Received 10th packet
+Received 20th packet
+Total received packets: 25. Time: 3.9040379524230957
+
+Packets amount: 1950
+Packets amount after concat: 1975
+
+Stop playing sound 1760 Hz
+Start 1785Hz test:
+---------------------------------------------
+Start playing sound 1785 Hz
+Stop playing sound 1785 Hz
+asdasdasdsa
 Traceback (most recent call last):
-  File "C:\Users\user\PycharmProjects\fpv\main.py", line 93, in <module>
+  File "C:\Users\user\PycharmProjects\fpv\main.py", line 97, in <module>
     breakpoint()
 KeyboardInterrupt
