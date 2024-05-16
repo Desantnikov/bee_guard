@@ -40,7 +40,7 @@ TODO:
     add config class
     move logger setup to config
     move pandas settings to config
-    move saving inside analyzer class
+    + move saving inside analyzer class
     refactor importing StrEnum
     use mock drone data if script launched with "--mock" parameter 
     
@@ -151,8 +151,7 @@ try:
     if SHOW_PLOTS:
         analyzer.show_plot()
 
-    saved_file_name = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")  # TODO: Move saving to analyzer class
-    analyzer.packets_df.to_csv(f"./{COLLECTED_DATA_FOLDER}/{saved_file_name}.csv")
+    analyzer.save_packets()
 
     logger.info("FINISH")
 
