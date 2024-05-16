@@ -16,6 +16,7 @@ matplotlib = "*"
 ruff = "*"
 black = "*"
 isort = "*"
+strenum = "*"
 
 [dev-packages]
 

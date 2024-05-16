@@ -33,6 +33,8 @@ TODO:
      
     add config class
     move saving inside analyzer class
+    refactor importing StrEnum
+    use mock drone data if script launched with "--mock" parameter 
     
     migrate to poetry
     

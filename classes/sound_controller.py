@@ -22,9 +22,6 @@ class SoundController:
 
     @classmethod
     def playback_start_threaded(cls, frequency: int, duration: int = None):
-        if USE_SAMPLE_PACKETS:  # skip playback if using not real data
-            return
-
         if duration is None:
             duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
 

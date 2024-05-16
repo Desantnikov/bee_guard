@@ -1,4 +1,9 @@
-from enum import StrEnum
+import sys
+
+if sys.version_info.minor >= 11:
+    from enum import StrEnum
+else:
+    from strenum import StrEnum
 
 
 class PacketTypes(StrEnum):
