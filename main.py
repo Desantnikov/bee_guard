@@ -4,7 +4,9 @@ import time
 import pandas as pd
 from pymavlink import mavutil
 
-from analyzer import Analyzer
+from classes.analyzer import Analyzer
+from classes.drone_controller import DroneController, MockedDroneController
+from classes.sound_controller import SoundController
 from constants import (
     AUDIO_FREQUENCY_LIMIT,
     AUDIO_FREQUENCY_STEP,
@@ -19,15 +21,20 @@ from constants import (
     RESET_INPUT_BUFFER,
     USE_SAMPLE_PACKETS,
 )
-from mavlink_wrapper import MavlinkWrapper, MockedMavlinkWrapper
-from sound_controller import SoundController
 
 """
 TODO: 
+    make packets collecting and sound playback time equal
+    handle drone-pc communication breakdown (currently no read timeout, so waits for new packets forever)
+    
     add logging
-    handle drone-pc communication breakdown (currently no read timeout, so waits for new packets forever) 
+    create new "<start_time>_mavlink_logs.log" file for each run
+    remove parent try/except
+     
     add config class
     move saving inside analyzer class
+    
+    migrate to poetry
     
 """
 
@@ -52,12 +59,11 @@ Flow:
 
 
 try:
-
-    mavlink_wrapper_cls = MavlinkWrapper
+    drone_controller_cls = DroneController
     if USE_SAMPLE_PACKETS:  # use fake wrapper returning sample data if enabled
-        mavlink_wrapper_cls = MockedMavlinkWrapper
+        drone_controller_cls = MockedDroneController
 
-    mavlink_wrapper = mavlink_wrapper_cls(
+    drone_controller = drone_controller_cls(
         serial_port=MAVLINK_SERIAL_PORT,
         baudrate=MAVLINK_SERIAL_BAUDRATE,
         default_exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],  # TODO: Move to constants?
@@ -65,13 +71,13 @@ try:
     )
 
     # set RAW_IMU message update frequency
-    mavlink_wrapper.request_message_interval(
+    drone_controller.request_message_interval(
         message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
         frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     )
 
     # read first X packets without sound enabled to use as a reference data
-    reference_packet_dicts = mavlink_wrapper.receive_multiple_packet_dicts(
+    reference_packet_dicts = drone_controller.receive_multiple_packet_dicts(
         packet_type=PACKET_TYPE_TO_ANALYZE,
         packets_read_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     )
@@ -80,12 +86,12 @@ try:
 
     current_audio_frequency = INITIAL_AUDIO_FREQUENCY
     while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
-        mavlink_wrapper.clear_input_buffer()  # clear all input packets before iteration
+        drone_controller.clear_input_buffer()  # clear all input packets before iteration
 
         print(f"Start {current_audio_frequency}Hz test:\r\n" f"---------------------------------------------")
         SoundController.playback_start_threaded(frequency=current_audio_frequency)  # audio playback in separate thread
 
-        packets_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read X packets to use as a reference
+        packets_dicts = drone_controller.receive_multiple_packet_dicts(  # read X packets to use as a reference
             packet_type=PACKET_TYPE_TO_ANALYZE,
             packets_read_amount=PACKETS_TO_COLLECT_WITH_AUDIO,
         )

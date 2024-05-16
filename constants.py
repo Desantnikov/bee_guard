@@ -19,5 +19,6 @@ AUDIO_FREQUENCY_STEP = 25
 
 FREQUENCY_COL_NAME = "Frequency"
 
+LOGS_DATA_FOLDER = "logs"
 MOCK_DATA_FOLDER = "mock_data"
 COLLECTED_DATA_FOLDER = "collected_data"

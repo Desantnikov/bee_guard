@@ -4,10 +4,10 @@ from typing import List
 import pandas as pd
 from pymavlink import mavutil
 
-from constants import MOCK_DATA_FOLDER
+from constants import LOGS_DATA_FOLDER, MOCK_DATA_FOLDER
 
 
-class MavlinkWrapper:
+class DroneController:
     """
     https://www.ardusub.com/developers/pymavlink.html#autopilot-eg-pixhawk-connected-to-the-computer-via-serial
     """
@@ -22,11 +22,11 @@ class MavlinkWrapper:
 
         self.connection = mavutil.mavlink_connection(serial_port, baud=baudrate)
         self.connection.wait_heartbeat(blocking=True, timeout=15)
-        print("Connected to mavlink_wrapper")
+        print("Connected to drone_controller")
 
         self.default_exclude_fields = default_exclude_fields
         self.do_reset_input_buffer = do_reset_input_buffer
-        self.connection.setup_logfile("./mavlink_logs.log")
+        self.connection.setup_logfile(f"{LOGS_DATA_FOLDER}/mavlink_logs.log")
 
     def receive_packet_dict(self, packet_type: str = None, blocking: bool = True, exclude_fields: List[str] = None):
         packet = self.connection.recv_match(type=packet_type, blocking=blocking, timeout=30)
@@ -117,7 +117,7 @@ class MavlinkWrapper:
             received = self.connection.recv_msg()
 
 
-class MockedMavlinkWrapper(MavlinkWrapper):
+class MockedDroneController(DroneController):
     def __init__(self, *args, **kwargs):
         reference_packet_dicts = self._read_sample_data("100_RAW_IMU_reference_packets.csv").to_dict()
         influenced_packet_dicts = self._read_sample_data("10_RAW_IMU_anomaly_packets.csv").to_dict()
