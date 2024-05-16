@@ -6,6 +6,6 @@ else:
     from strenum import StrEnum
 
 
-class PacketTypes(StrEnum):
+class PacketType(StrEnum):
     RAW_IMU = "RAW_IMU"
     MAVLINK_MSG_ID_HIGHRES_IMU = "MAVLINK_MSG_ID_HIGHRES_IMU"  # TODO: Check if real packet type

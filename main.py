@@ -31,7 +31,7 @@ TODO:
     handle drone-pc communication breakdown (currently no read timeout, so waits for new packets forever)
     adjust drawing plots
     
-    add logging
+    + add logging
     create new "<start_time>_mavlink_logs.log" file for each run
     remove parent try/except
      
@@ -107,7 +107,11 @@ try:
         drone_controller.clear_input_buffer()  # clear all input packets before iteration
 
         logger.info(f"\r\n\r\nStart {current_audio_frequency}Hz test:\r\n---------------------------------------------")
-        sound_controller.playback_start_threaded(frequency=current_audio_frequency)  # audio playback in separate thread
+
+        duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
+        sound_controller.playback_start_threaded(
+            frequency=current_audio_frequency, duration=duration
+        )  # audio playback in separate thread
 
         packets_dicts = drone_controller.receive_multiple_packet_dicts(  # read X packets to use as a reference
             packet_type=PACKET_TYPE_TO_ANALYZE,

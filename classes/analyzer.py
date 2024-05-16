@@ -89,5 +89,5 @@ class Analyzer(LoggerMixin):
         plt.show()
 
     def update_frequency_col(self, frequency: int):
-        # set provided frequency value for last packets batch (without frequcny set)
+        # set provided frequency values_list for last packets batch (without frequcny set)
         self.packets_df[FREQUENCY_COL_NAME] = self.packets_df[FREQUENCY_COL_NAME].fillna(frequency)

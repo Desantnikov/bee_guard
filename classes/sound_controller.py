@@ -1,105 +1,79 @@
-import math
-import struct
 import threading
+import time
 
+import numpy as np
 import pyaudio
+import scipy
 
 from classes.logger_mixin import LoggerMixin
-from constants import (
-    CHANNELS,
-    FORMAT,
-    PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
-    PACKETS_TO_COLLECT_WITH_AUDIO,
-    RATE,
-)
+from constants import AUDIO_CHANNELS, AUDIO_FORMAT, AUDIO_SAMPLING_RATE
 
 
 class SoundController(LoggerMixin):
-    pyaudio_instance = pyaudio.PyAudio()
-    playback_thread = None
-    stream = pyaudio_instance.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.pyaudio_instance = pyaudio.PyAudio()
+        self.stream = self.pyaudio_instance.open(
+            format=AUDIO_FORMAT, channels=AUDIO_CHANNELS, rate=AUDIO_SAMPLING_RATE, output=True
+        )
+        self.playback_thread = None
+        self.amplitude = 25
+
     def playback_start_threaded(self, frequency: int, duration: int = None):
-        if duration is None:
-            duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
+        frames = self.generate_audio_frames(frequency=frequency, duration=duration)
 
         self.playback_thread = threading.Thread(
-            target=self._playback_start, kwargs={"frequency": frequency, "duration": duration}
+            target=self.playback_start, kwargs={"frequency": frequency, "duration": duration, "frames": frames}
         )
         self.playback_thread.start()
         self.logger.debug("Audio playback thread started")
 
-        # time.sleep(1)  # wait for playback to start
-
-    def _playback_start(self, frequency: int, duration: int):  # blocking, should be ued inside separate thread
-        self.logger.debug("_playback_start function start")
-
-        frames = self._data_for_freq(frequency, duration)
-        stream = self.stream
-
-        self.logger.info(f"Start playing sound {frequency} Hz")
-        stream.write(frames)
-
+    def playback_start(
+        self, frequency: int, duration: int, frames: np.ndarray
+    ):  # blocking, should be used inside separate thread
+        self.logger.info(f"Start playing sound {frequency} Hz for {duration} time")
+        self.stream.write(frames.tobytes())
         self.logger.info(f"Stop playing sound {frequency} Hz")
 
-        self.logger.debug("_playback_start function finish")
-        # self.playback_thread = None  # use it as a flag to check if thread is finished
+    def bandpass_filter(self, data: np.ndarray, edges: list[float], sample_rate: float, poles: int = 5):
+        sos = scipy.signal.butter(poles, edges, "bandpass", fs=sample_rate)
+        filtered_data = scipy.signal.filtfilt(*sos, x=data)
+        return filtered_data
 
-    def _data_for_freq(self, frequency: float, time: float = None):  # proudly copy-pasted from stackoverflow
-        """
-        get frames for a fixed frequency for a specified time or
-        number of frames, if frame_count is specified, the specified
-        time is ignored
-        """
+    def remove_low_frequencies(self, data, sampling_rate, cutoff_frequency):
+        # Design a high-pass filter
+        nyquist_frequency = 0.5 * sampling_rate
+        high_pass_frequency = cutoff_frequency / nyquist_frequency
+        b, a = scipy.signal.butter(4, high_pass_frequency, btype="low")
+
+        # Apply the filter to the data
+        filtered_data = scipy.signal.filtfilt(b, a, data)
+        return filtered_data
+
+    def generate_audio_frames(self, frequency: float, duration: int = 1):
         self.logger.debug("Start audio data generation")
 
-        frame_count = int(RATE * time)
+        t = np.linspace(0, duration, int(AUDIO_SAMPLING_RATE * duration), endpoint=False)
+        wavedata = np.sin(2 * np.pi * frequency * t)
 
-        remainder_frames = frame_count % RATE
-        wavedata = []
-
-        for i in range(frame_count):
-            a = RATE / frequency  # number of frames per wave
-            b = i / a
-            # explanation for b
-            # considering one wave, what part of the wave should this be
-            # if we graph the sine wave in a
-            # displacement vs i graph for the particle
-            # where 0 is the beginning of the sine wave and
-            # 1 the end of the sine wave
-            # which part is "i" is denoted by b
-            # for clarity you might use
-            # though this is redundant since math.sin is a looping function
-            # b = b - int(b)
-
-            c = b * (2 * math.pi)
-            # explanation for c
-            # now we map b to between 0 and 2*math.PI
-            # since 0 - 2*PI, 2*PI - 4*PI, ...
-            # are the repeating domains of the sin wave (so the decimal values will
-            # also be mapped accordingly,
-            # and the integral values will be multiplied
-            # by 2*PI and since sin(n*2*PI) is zero where n is an integer)
-            d = math.sin(c) * 32767
-            e = int(d)
-            wavedata.append(e)
-
-        for _ in range(remainder_frames):
-            wavedata.append(0)
-
-        number_of_bytes = str(len(wavedata))
-        wavedata = struct.pack(number_of_bytes + "h", *wavedata)
+        # wavedata = self.remove_low_frequencies(wavedata, AUDIO_SAMPLING_RATE, cutoff_frequency=16000)
+        wavedata = self.bandpass_filter(wavedata, [16000, 30000], AUDIO_SAMPLING_RATE)
+        # wavedata = self.bandpass_filter(wavedata, [200, 18000], AUDIO_SAMPLING_RATE)
+        # wavedata = self.remove_low_frequencies(wavedata, AUDIO_SAMPLING_RATE, cutoff_frequency=7000)
 
         self.logger.debug("Finish audio data generation")
-
         return wavedata
 
 
 if __name__ == "__main__":
-    FREQUENCY = 21000
-    DURATION = 5
+    FREQUENCY = 20000
+    DURATION = 1000
 
-    SoundController._playback_start(frequency=FREQUENCY, duration=DURATION)
+    sound_controller = SoundController()
+
+    waveform = sound_controller.generate_audio_frames(FREQUENCY)
+    start_time = time.time()
+    print("play")
+    sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=waveform)
+    print(f"Elapsed: {time.time() -start_time}")
