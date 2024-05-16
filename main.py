@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 import pandas as pd
@@ -10,18 +9,17 @@ from classes.sound_controller import SoundController
 from constants import (
     AUDIO_FREQUENCY_LIMIT,
     AUDIO_FREQUENCY_STEP,
-    COLLECTED_DATA_FOLDER,
     INITIAL_AUDIO_FREQUENCY,
     LOG_FILE_NAME,
     MAVLINK_SERIAL_BAUDRATE,
     MAVLINK_SERIAL_PORT,
+    MOCK_DRONE_CONTROLLER,
     PACKET_TYPE_TO_ANALYZE,
     PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     PACKETS_TO_COLLECT_WITH_AUDIO,
     PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     RESET_INPUT_BUFFER,
     SHOW_PLOTS,
-    MOCK_DRONE_CONTROLLER,
 )
 from logger_setup import setup_logger
 
@@ -35,7 +33,7 @@ TODO:
     
     + add logging
     create new "<start_time>_mavlink_logs.log" file for each run
-    remove parent try/except
+    + remove parent try/except
      
     add config class
     move logger setup to config
@@ -74,8 +72,8 @@ setup_logger(log_file_name=LOG_FILE_NAME, log_level=logging.DEBUG)  # TODO: Move
 
 logger = logging.getLogger("main")
 
-try:
 
+def launch():
     logger.info("TEST")
 
     drone_controller_cls = DroneController
@@ -155,6 +153,10 @@ try:
 
     logger.info("FINISH")
 
-except Exception:
-    logger.exception(msg="Exception", exc_info=True)
-    breakpoint()
+
+if __name__ == "__main__":
+    try:
+        launch()
+    except Exception:
+        logger.exception(msg="Exception", exc_info=True)
+        breakpoint()

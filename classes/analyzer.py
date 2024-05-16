@@ -1,12 +1,13 @@
-from typing import Dict, List
 import datetime
+from typing import Dict, List
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 from classes.logger_mixin import LoggerMixin
-from constants import FREQUENCY_COL_NAME, COLLECTED_DATA_FOLDER
+from constants import COLLECTED_DATA_FOLDER, FREQUENCY_COL_NAME
 
 
 class Analyzer(LoggerMixin):
@@ -43,7 +44,7 @@ class Analyzer(LoggerMixin):
         saved_file_path = f"./{COLLECTED_DATA_FOLDER}/{saved_file_name}.csv"
 
         self.packets_df.to_csv(saved_file_path)
-        self.logger.info(f'Saved data to {saved_file_path}')
+        self.logger.info(f"Saved data to {saved_file_path}")
 
     def calc_zscore_outliners(self):
         """
