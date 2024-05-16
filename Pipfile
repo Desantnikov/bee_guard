@@ -13,6 +13,9 @@ pyaudio = "*"
 pysine = "*"
 scipy = "*"
 matplotlib = "*"
+ruff = "*"
+black = "*"
+isort = "*"
 
 [dev-packages]
 

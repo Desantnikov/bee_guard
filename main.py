@@ -1,23 +1,43 @@
+import datetime
 import time
 
+import pandas as pd
 from pymavlink import mavutil
 
-import constants
-from constants import MAVLINK_SERIAL_PORT, MAVLINK_SERIAL_BAUDRATE, PACKETS_TO_COLLECT_WITHOUT_AUDIO, \
-    PACKETS_TO_COLLECT_WITH_AUDIO, RESET_INPUT_BUFFER, PACKET_TYPE_TO_ANALYZE, PACKET_TYPE_UPDATE_RATE_TO_REQUEST, \
-    INITIAL_AUDIO_FREQUENCY, AUDIO_FREQUENCY_LIMIT, AUDIO_FREQUENCY_STEP, USE_SAMPLE_PACKETS
-from mavlink_wrapper import MavlinkWrapper, FakeMavlinkWrapper
 from analyzer import Analyzer
+from constants import (
+    AUDIO_FREQUENCY_LIMIT,
+    AUDIO_FREQUENCY_STEP,
+    COLLECTED_DATA_FOLDER,
+    INITIAL_AUDIO_FREQUENCY,
+    MAVLINK_SERIAL_BAUDRATE,
+    MAVLINK_SERIAL_PORT,
+    PACKET_TYPE_TO_ANALYZE,
+    PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
+    PACKETS_TO_COLLECT_WITH_AUDIO,
+    PACKETS_TO_COLLECT_WITHOUT_AUDIO,
+    RESET_INPUT_BUFFER,
+    USE_SAMPLE_PACKETS,
+)
+from mavlink_wrapper import MavlinkWrapper, MockedMavlinkWrapper
 from sound_controller import SoundController
-import pandas as pd
+
+"""
+TODO: 
+    add logging
+    handle drone-pc communication breakdown (currently no read timeout, so waits for new packets forever) 
+    add config class
+    move saving inside analyzer class
+    
+"""
 
 
 # TODO: Move to config
-pd.set_option('display.max_colwidth', None)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
-pd.set_option('display.expand_frame_repr', False)
-pd.set_option('display.float_format', lambda x: '%.2f' % x)
+pd.set_option("display.max_colwidth", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.expand_frame_repr", False)
+pd.set_option("display.float_format", lambda x: f"{x:.2f}")
 
 """
 Flow:
@@ -35,35 +55,35 @@ try:
 
     mavlink_wrapper_cls = MavlinkWrapper
     if USE_SAMPLE_PACKETS:  # use fake wrapper returning sample data if enabled
-        mavlink_wrapper_cls = FakeMavlinkWrapper
-
+        mavlink_wrapper_cls = MockedMavlinkWrapper
 
     mavlink_wrapper = mavlink_wrapper_cls(
         serial_port=MAVLINK_SERIAL_PORT,
         baudrate=MAVLINK_SERIAL_BAUDRATE,
-        default_exclude_fields=['mavpackettype', 'id', 'xmag', 'ymag', 'zmag'],  # TODO: Move to constants?
+        default_exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],  # TODO: Move to constants?
         do_reset_input_buffer=RESET_INPUT_BUFFER,
     )
-    mavlink_wrapper.request_message_interval(  # set RAW_IMU message update frequency
+
+    # set RAW_IMU message update frequency
+    mavlink_wrapper.request_message_interval(
         message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
         frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     )
-    reference_packet_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read first X packets to use as a reference
+
+    # read first X packets without sound enabled to use as a reference data
+    reference_packet_dicts = mavlink_wrapper.receive_multiple_packet_dicts(
         packet_type=PACKET_TYPE_TO_ANALYZE,
         packets_read_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     )
 
     main_analyzer = Analyzer(packets_dicts=reference_packet_dicts)
 
-
     current_audio_frequency = INITIAL_AUDIO_FREQUENCY
     while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
         mavlink_wrapper.clear_input_buffer()  # clear all input packets before iteration
 
-        print(f'Start {current_audio_frequency}Hz test:\r\n'
-              f'---------------------------------------------')
+        print(f"Start {current_audio_frequency}Hz test:\r\n" f"---------------------------------------------")
         SoundController.playback_start_threaded(frequency=current_audio_frequency)  # audio playback in separate thread
-        time.sleep(1)  # wait for playback to start
 
         packets_dicts = mavlink_wrapper.receive_multiple_packet_dicts(  # read X packets to use as a reference
             packet_type=PACKET_TYPE_TO_ANALYZE,
@@ -78,23 +98,24 @@ try:
 
         current_audio_frequency += AUDIO_FREQUENCY_STEP
 
+    print(
+        f"\r\n"
+        f"Anomalies:\r\n"
+        f"----------------------------------------------------------\r\n"
+        f"{main_analyzer.describe_packets()}\r\n\r\n"
+    )
 
-    print(f'\r\n'
-          f'Anomalies:\r\n'
-          f'----------------------------------------------------------\r\n'
-          f'{main_analyzer.describe_packets()}\r\n\r\n')
-
-    print(f'Z-Score outliners:\r\n{main_analyzer.calc_zscore_outliners()}')
+    print(f"Z-Score outliners:\r\n{main_analyzer.calc_zscore_outliners()}")
 
     main_analyzer.show_plot()
-    main_analyzer.packets_df.to_csv('last_run_dataframe.csv')
+
+    saved_file_name = datetime.datetime.now().strftime("%m/%d/%Y-%H:%M:%S")  # TODO: Move saving to analyzer class
+    main_analyzer.packets_df.to_csv(f"{COLLECTED_DATA_FOLDER}/{saved_file_name}.csv")
 
     breakpoint()
-    print('SSSSSS')
+    print("SSSSSS")
 
-except Exception as e:
-    print('asdasdasdsa')
+except Exception:
+    print("asdasdasdsa")
     breakpoint()
-    print('asdasdasd')
-
-
+    print("asdasdasd")

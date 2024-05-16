@@ -1,11 +1,11 @@
-import matplotlib.pyplot
+from typing import Dict, List
+
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats
-from typing import List, Dict
-from constants import FREQUENCY_COL_NAME
-
 import pandas as pd
+from scipy import stats
+
+from constants import FREQUENCY_COL_NAME
 
 
 class Analyzer:
@@ -19,28 +19,27 @@ class Analyzer:
         self.z_score_outliners = None
 
     def append_packets(self, packets_dicts: List[Dict]):
-        print(f'\r\nPackets amount: {len(self.packets_df)}')
+        print(f"\r\nPackets amount: {len(self.packets_df)}")
         new_packets_df = pd.DataFrame(packets_dicts)
         self.packets_df = pd.concat([self.packets_df, new_packets_df], ignore_index=True)
-        print(f'Packets amount after concat: {len(self.packets_df)}\r\n')
-
+        print(f"Packets amount after concat: {len(self.packets_df)}\r\n")
 
     def describe_packets(self):
         # described_packets = self.packets_df.transpose(copy=True).describe(percentiles=[]).reset_index()
         # del(described_packets['count'])
 
-        print(f'Described: \r\n{self.packets_df.describe()}\r\n\r\n')
-        print(f'Rolling standard deviatio for each value:\r\n'
-              f'{self.packets_df.std()}')
-
+        print(f"Described: \r\n{self.packets_df.describe()}\r\n\r\n")
+        print(f"Rolling standard deviatio for each value:\r\n" f"{self.packets_df.std()}")
 
     def calc_zscore_outliners(self):
         """
-        A positive z-score indicates the raw score is higher than the mean average. For example, if a z-score is equal to +1, it is 1 standard deviation above the mean.
-        A negative z-score reveals the raw score is below the mean average. For example, if a z-score is equal to -2, it is two standard deviations below the mean.
+        A positive z-score indicates the raw score is higher than the mean average.
+        For example, if a z-score is equal to +1, it is 1 standard deviation above the mean.
+        A negative z-score reveals the raw score is below the mean average.
+        For example, if a z-score is equal to -2, it is two standard deviations below the mean.
         """
         z = np.abs(stats.zscore(self.packets_df))
-        self.z_score_outliners = self.packets_df[z > self.z_score_threshold].dropna(how='all')
+        self.z_score_outliners = self.packets_df[z > self.z_score_threshold].dropna(how="all")
 
         # outliners plot
         # plt.figure(figsize=(20, 16))
@@ -50,7 +49,6 @@ class Analyzer:
         # plt.legend()
         # plt.grid(True)
         # plt.show()
-
 
         return self.z_score_outliners
 
@@ -67,18 +65,18 @@ class Analyzer:
         # plt.show()
 
         plt.figure(figsize=(12, 6))
-        plt.plot(self.packets_df['time_usec'], self.packets_df['Frequency'], label='Frequency')
-        plt.plot(self.packets_df['time_usec'], self.packets_df['xacc'], label='xacc')
-        plt.plot(self.packets_df['time_usec'], self.packets_df['yacc'], label='yacc')
-        plt.plot(self.packets_df['time_usec'], self.packets_df['zacc'], label='zacc')
+        plt.plot(self.packets_df["time_usec"], self.packets_df["Frequency"], label="Frequency")
+        plt.plot(self.packets_df["time_usec"], self.packets_df["xacc"], label="xacc")
+        plt.plot(self.packets_df["time_usec"], self.packets_df["yacc"], label="yacc")
+        plt.plot(self.packets_df["time_usec"], self.packets_df["zacc"], label="zacc")
 
-        plt.plot(self.packets_df['time_usec'], self.packets_df['xgyro'], label='xgyro')
-        plt.plot(self.packets_df['time_usec'], self.packets_df['ygyro'], label='ygyro')
-        plt.plot(self.packets_df['time_usec'], self.packets_df['zgyro'], label='zgyro')
+        plt.plot(self.packets_df["time_usec"], self.packets_df["xgyro"], label="xgyro")
+        plt.plot(self.packets_df["time_usec"], self.packets_df["ygyro"], label="ygyro")
+        plt.plot(self.packets_df["time_usec"], self.packets_df["zgyro"], label="zgyro")
 
-        plt.xlabel('Time (usec)')
-        plt.ylabel('Values')
-        plt.title('Sensor Data over Time')
+        plt.xlabel("Time (usec)")
+        plt.ylabel("Values")
+        plt.title("Sensor Data over Time")
         plt.legend()
         plt.grid(True)
         plt.show()

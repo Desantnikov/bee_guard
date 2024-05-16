@@ -1,0 +1,17 @@
+[tool.ruff]
+line-length = 120
+extend-select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "UP",  # pyupgrade
+    "B",  # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "I",  # isort
+]
+exclude = ["./mock_data", "./firmwares", "./configs", "./collected_data"]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"

@@ -1,10 +1,18 @@
-import pyaudio
-import struct
 import math
+import struct
 import threading
-from constants import USE_SAMPLE_PACKETS
+import time
 
-from constants import FORMAT, CHANNELS, RATE, PACKETS_TO_COLLECT_WITH_AUDIO, PACKET_TYPE_UPDATE_RATE_TO_REQUEST
+import pyaudio
+
+from constants import (
+    CHANNELS,
+    FORMAT,
+    PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
+    PACKETS_TO_COLLECT_WITH_AUDIO,
+    RATE,
+    USE_SAMPLE_PACKETS,
+)
 
 
 class SoundController:
@@ -20,26 +28,32 @@ class SoundController:
         if duration is None:
             duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
 
-        cls.playback_thread = threading.Thread(target=cls._playback_start, kwargs={'frequency': frequency, 'duration': duration})
+        cls.playback_thread = threading.Thread(
+            target=cls._playback_start, kwargs={"frequency": frequency, "duration": duration}
+        )
         cls.playback_thread.start()
 
+        time.sleep(1)  # wait for playback to start
+
     @classmethod
-    def _playback_start(cls, frequency: int, duration: int):   # blocking, should be ued inside separate thread
+    def _playback_start(cls, frequency: int, duration: int):  # blocking, should be ued inside separate thread
         frames = cls._data_for_freq(frequency, duration)
         stream = cls.stream
 
-        print(f'Start playing sound {frequency} Hz')
+        print(f"Start playing sound {frequency} Hz")
         stream.write(frames)
 
-        print(f'Stop playing sound {frequency} Hz')
+        print(f"Stop playing sound {frequency} Hz")
 
         cls.playback_thread = None  # use it as a flag to check if thread is finished
 
     @staticmethod
-    def _data_for_freq(frequency: float, time: float = None):
-        """get frames for a fixed frequency for a specified time or
+    def _data_for_freq(frequency: float, time: float = None):  # proudly copy-pasted from stackoverflow
+        """
+        get frames for a fixed frequency for a specified time or
         number of frames, if frame_count is specified, the specified
-        time is ignored"""
+        time is ignored
+        """
         frame_count = int(RATE * time)
 
         remainder_frames = frame_count % RATE
@@ -71,11 +85,11 @@ class SoundController:
             e = int(d)
             wavedata.append(e)
 
-        for i in range(remainder_frames):
+        for _ in range(remainder_frames):
             wavedata.append(0)
 
         number_of_bytes = str(len(wavedata))
-        wavedata = struct.pack(number_of_bytes + 'h', *wavedata)
+        wavedata = struct.pack(number_of_bytes + "h", *wavedata)
 
         return wavedata
 
