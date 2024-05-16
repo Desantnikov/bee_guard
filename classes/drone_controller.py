@@ -119,6 +119,8 @@ class DroneController(LoggerMixin):
         while received:
             received = self.connection.recv_msg()
 
+        self.logger.info('Input buffer cleared')
+
 
 class MockedDroneController(DroneController):
     def __init__(self, *args, **kwargs):

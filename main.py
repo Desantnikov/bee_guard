@@ -21,14 +21,16 @@ from constants import (
     PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     RESET_INPUT_BUFFER,
     SHOW_PLOTS,
-    USE_SAMPLE_PACKETS,
+    MOCK_DRONE_CONTROLLER,
 )
 from logger_setup import setup_logger
 
 """
 TODO: 
+    + high frequency playback
+    filter noise when playback
     make packets collecting and sound playback time equal
-    handle drone-pc communication breakdown (currently no read timeout, so waits for new packets forever)
+    + handle drone-pc communication breakdown
     adjust drawing plots
     
     + add logging
@@ -77,7 +79,7 @@ try:
     logger.info("TEST")
 
     drone_controller_cls = DroneController
-    if USE_SAMPLE_PACKETS:  # use fake wrapper returning sample data if enabled
+    if MOCK_DRONE_CONTROLLER:  # use fake wrapper returning sample data if enabled
         drone_controller_cls = MockedDroneController
 
     drone_controller = drone_controller_cls(
