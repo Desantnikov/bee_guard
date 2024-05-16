@@ -1,56 +1,61 @@
 import math
 import struct
 import threading
-import time
 
 import pyaudio
 
+from classes.logger_mixin import LoggerMixin
 from constants import (
     CHANNELS,
     FORMAT,
     PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     PACKETS_TO_COLLECT_WITH_AUDIO,
     RATE,
-    USE_SAMPLE_PACKETS,
 )
 
 
-class SoundController:
+class SoundController(LoggerMixin):
     pyaudio_instance = pyaudio.PyAudio()
     playback_thread = None
     stream = pyaudio_instance.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
 
-    @classmethod
-    def playback_start_threaded(cls, frequency: int, duration: int = None):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def playback_start_threaded(self, frequency: int, duration: int = None):
         if duration is None:
             duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
 
-        cls.playback_thread = threading.Thread(
-            target=cls._playback_start, kwargs={"frequency": frequency, "duration": duration}
+        self.playback_thread = threading.Thread(
+            target=self._playback_start, kwargs={"frequency": frequency, "duration": duration}
         )
-        cls.playback_thread.start()
+        self.playback_thread.start()
+        self.logger.debug("Audio playback thread started")
 
-        time.sleep(1)  # wait for playback to start
+        # time.sleep(1)  # wait for playback to start
 
-    @classmethod
-    def _playback_start(cls, frequency: int, duration: int):  # blocking, should be ued inside separate thread
-        frames = cls._data_for_freq(frequency, duration)
-        stream = cls.stream
+    def _playback_start(self, frequency: int, duration: int):  # blocking, should be ued inside separate thread
+        self.logger.debug("_playback_start function start")
 
-        print(f"Start playing sound {frequency} Hz")
+        frames = self._data_for_freq(frequency, duration)
+        stream = self.stream
+
+        self.logger.info(f"Start playing sound {frequency} Hz")
         stream.write(frames)
 
-        print(f"Stop playing sound {frequency} Hz")
+        self.logger.info(f"Stop playing sound {frequency} Hz")
 
-        cls.playback_thread = None  # use it as a flag to check if thread is finished
+        self.logger.debug("_playback_start function finish")
+        # self.playback_thread = None  # use it as a flag to check if thread is finished
 
-    @staticmethod
-    def _data_for_freq(frequency: float, time: float = None):  # proudly copy-pasted from stackoverflow
+    def _data_for_freq(self, frequency: float, time: float = None):  # proudly copy-pasted from stackoverflow
         """
         get frames for a fixed frequency for a specified time or
         number of frames, if frame_count is specified, the specified
         time is ignored
         """
+        self.logger.debug("Start audio data generation")
+
         frame_count = int(RATE * time)
 
         remainder_frames = frame_count % RATE
@@ -87,6 +92,8 @@ class SoundController:
 
         number_of_bytes = str(len(wavedata))
         wavedata = struct.pack(number_of_bytes + "h", *wavedata)
+
+        self.logger.debug("Finish audio data generation")
 
         return wavedata
 

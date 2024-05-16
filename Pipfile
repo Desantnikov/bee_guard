@@ -19,6 +19,7 @@ isort = "*"
 strenum = "*"
 
 [dev-packages]
+snakeviz = "*"
 
 [requires]
 python_version = "3.9"

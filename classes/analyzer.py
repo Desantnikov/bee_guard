@@ -5,11 +5,14 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from classes.logger_mixin import LoggerMixin
 from constants import FREQUENCY_COL_NAME
 
 
-class Analyzer:
+class Analyzer(LoggerMixin):
     def __init__(self, packets_dicts: List[Dict]):
+        super().__init__(packets_dicts)
+
         self.packets_df = pd.DataFrame(packets_dicts)
 
         # first batch of packets should be a reference batch without audio enabled
@@ -19,17 +22,21 @@ class Analyzer:
         self.z_score_outliners = None
 
     def append_packets(self, packets_dicts: List[Dict]):
-        print(f"\r\nPackets amount: {len(self.packets_df)}")
+        self.logger.info(f"Packets amount: {len(self.packets_df)}")
         new_packets_df = pd.DataFrame(packets_dicts)
         self.packets_df = pd.concat([self.packets_df, new_packets_df], ignore_index=True)
-        print(f"Packets amount after concat: {len(self.packets_df)}\r\n")
+        self.logger.info(f"Packets amount after concat: {len(self.packets_df)}")
 
     def describe_packets(self):
         # described_packets = self.packets_df.transpose(copy=True).describe(percentiles=[]).reset_index()
         # del(described_packets['count'])
 
-        print(f"Described: \r\n{self.packets_df.describe()}\r\n\r\n")
-        print(f"Rolling standard deviatio for each value:\r\n" f"{self.packets_df.std()}")
+        self.logger.info(f"Described: \r\n{self.packets_df.describe()}")
+        self.logger.info(
+            f"\r\nRolling standard deviatio for each value:\r\n"
+            f"---------------------------------------------\r\n"
+            f"{self.packets_df.std()}"
+        )
 
     def calc_zscore_outliners(self):
         """
