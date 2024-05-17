@@ -30,8 +30,8 @@ def setup_logger(log_file_name, log_level):
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
 
-    matplotlib_logger = logging.getLogger("matplotlib")
-    # matplotlib_logger.setLevel(logging.WARNING
+    matplotlib_logger = logging.getLogger("matplotlib.font_manager")
+    matplotlib_logger.setLevel(logging.INFO)
     # Add filter to ignore findfont logs from matplotlib
-    matplotlib_logger.addFilter(FindFontFilter())
+    # matplotlib_logger.addFilter(FindFontFilter())
     return logger

@@ -17,6 +17,7 @@ ruff = "*"
 black = "*"
 isort = "*"
 strenum = "*"
+jupyter = "*"
 
 [dev-packages]
 snakeviz = "*"

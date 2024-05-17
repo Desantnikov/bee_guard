@@ -2,25 +2,32 @@ import datetime
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
+import matplotlib.scale
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 from classes.logger_mixin import LoggerMixin
 from constants import COLLECTED_DATA_FOLDER, FREQUENCY_COL_NAME
+from enums import PositionFieldNames
 
 
 class Analyzer(LoggerMixin):
     def __init__(self, packets_dicts: List[Dict]):
         super().__init__(packets_dicts)
 
+        # first batch of packets should be a reference batch without audio enabled
         self.packets_df = pd.DataFrame(packets_dicts)
 
-        # first batch of packets should be a reference batch without audio enabled
-        self.packets_df.insert(2, FREQUENCY_COL_NAME, len(self.packets_df) * [0], True)
+        # add `Frequency` column
+        if FREQUENCY_COL_NAME not in self.packets_df.columns.values:
+            self.packets_df.insert(2, FREQUENCY_COL_NAME, len(self.packets_df) * [0], True)
 
         self.z_score_threshold = 3
         self.z_score_outliners = None
+
+    # def _add_frequency_column(self):
+
 
     def append_packets(self, packets_dicts: List[Dict]):
         self.logger.info(f"Packets amount: {len(self.packets_df)}")
@@ -56,45 +63,32 @@ class Analyzer(LoggerMixin):
         z = np.abs(stats.zscore(self.packets_df))
         self.z_score_outliners = self.packets_df[z > self.z_score_threshold].dropna(how="all")
 
-        # outliners plot
-        # plt.figure(figsize=(20, 16))
-        # plt.plot(outliners['index'], outliners['ygyro'], label='ygyro', marker='o', color='b')
-        # # plt.plot(outliners['index'], outliners['xgyro'], label='xgyro')
-        # # plt.plot(outliners['index'],outliners['zgyro'], label='zgyro')
-        # plt.legend()
-        # plt.grid(True)
-        # plt.show()
-
         return self.z_score_outliners
 
-    def show_plot(self):
-        # plt.figure(figsize=(12, 6))
-        #
-        # plt.plot(self.packets_df['Frequency'], self.packets_df['ygyro'], label='ygyro')
-        #
-        # plt.xlabel('Time (usec)')
-        # plt.ylabel('Values')
-        # plt.title('Sensor Data over Time')
-        # plt.legend()
-        # plt.grid(True)
-        # plt.show()
+    def show_plot(self, columns_to_show: List[PositionFieldNames], x_axis: str):
+        def fw(*args, **kwargs):
+            print('asdasd')
+        def bkw(*args, **kwargs):
+            print('asdasd')
 
         plt.figure(figsize=(12, 6))
-        plt.plot(self.packets_df["time_usec"], self.packets_df["Frequency"], label="Frequency")
-        plt.plot(self.packets_df["time_usec"], self.packets_df["xacc"], label="xacc")
-        plt.plot(self.packets_df["time_usec"], self.packets_df["yacc"], label="yacc")
-        plt.plot(self.packets_df["time_usec"], self.packets_df["zacc"], label="zacc")
+        for column_name in columns_to_show:
+            plt.plot(self.packets_df[x_axis], self.packets_df[column_name], label=column_name)#, scale=matplotlib.scale.FuncTransform(forward=fw, inverse=bkw))
 
-        plt.plot(self.packets_df["time_usec"], self.packets_df["xgyro"], label="xgyro")
-        plt.plot(self.packets_df["time_usec"], self.packets_df["ygyro"], label="ygyro")
-        plt.plot(self.packets_df["time_usec"], self.packets_df["zgyro"], label="zgyro")
+        data_label = columns_to_show[0].name if len(columns_to_show) == 1 else "values"
 
-        plt.xlabel("Time (usec)")
-        plt.ylabel("Values")
-        plt.title("Sensor Data over Time")
+        plt.ylabel(data_label)
+        plt.xlabel(x_axis)
+
+
+        # plt.sca(.get_matrix())
+        # plt.set_xticks(np.arange(0, 24, 1))
+
+        plt.title(f"Sensor {data_label} data by {x_axis}")
         plt.legend()
-        plt.grid(True)
+        plt.grid(which="both")
         plt.show()
+        self.logger.debug('Plot drawing finished')
 
     def update_frequency_col(self, frequency: int):
         # set provided frequency values_list for last packets batch (without frequcny set)

@@ -9,6 +9,7 @@ from classes.sound_controller import SoundController
 from constants import (
     AUDIO_FREQUENCY_LIMIT,
     AUDIO_FREQUENCY_STEP,
+    FREQUENCY_COL_NAME,
     INITIAL_AUDIO_FREQUENCY,
     LOG_FILE_NAME,
     MAVLINK_SERIAL_BAUDRATE,
@@ -20,12 +21,15 @@ from constants import (
     PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     RESET_INPUT_BUFFER,
     SHOW_PLOTS,
+    TIME_COL_NAME,
 )
+from enums import PositionFieldNames
 from logger_setup import setup_logger
 
 """
 TODO: 
     + high frequency playback
+    link packets and frequencies
     filter noise when playback
     make packets collecting and sound playback time equal
     + handle drone-pc communication breakdown
@@ -72,7 +76,7 @@ setup_logger(log_file_name=LOG_FILE_NAME, log_level=logging.DEBUG)  # TODO: Move
 
 logger = logging.getLogger("main")
 
-
+analyzer = None
 def launch():
     logger.info("TEST")
 
@@ -146,10 +150,15 @@ def launch():
         f"{analyzer.calc_zscore_outliners()}"
     )
 
-    if SHOW_PLOTS:
-        analyzer.show_plot()
-
     analyzer.save_packets()
+
+    if SHOW_PLOTS:
+        # draw separate plot for each column with time on X axis
+        for _, column_enum in PositionFieldNames.members():
+            analyzer.show_plot(columns_to_show=[column_enum], x_axis=TIME_COL_NAME)
+        # draw separate plot for each column with frequency on X axis
+        for _, column_enum in PositionFieldNames.members():
+            analyzer.show_plot(columns_to_show=[column_enum], x_axis=FREQUENCY_COL_NAME)
 
     logger.info("FINISH")
 
