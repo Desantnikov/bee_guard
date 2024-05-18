@@ -1,6 +1,6 @@
 import threading
 import time
-
+import synthesizer
 import numpy as np
 import pyaudio
 import scipy
@@ -18,6 +18,7 @@ class SoundController(LoggerMixin):
             format=AUDIO_FORMAT, channels=AUDIO_CHANNELS, rate=AUDIO_SAMPLING_RATE, output=True
         )
         self.playback_thread = None
+        self.synth = synthesizer.Synthesizer(rate=AUDIO_SAMPLING_RATE)
         self.amplitude = 25
 
     def playback_start_threaded(self, frequency: int, duration: int = None):
@@ -54,13 +55,15 @@ class SoundController(LoggerMixin):
     def generate_audio_frames(self, frequency: float, duration: int = 1):
         self.logger.debug("Start audio data generation")
 
-        t = np.linspace(0, duration, int(AUDIO_SAMPLING_RATE * duration), endpoint=False)
-        wavedata = np.sin(2 * np.pi * frequency * t)
+        # t = np.linspace(0, duration, int(AUDIO_SAMPLING_RATE * duration), endpoint=False)
+        # wavedata = np.sin(2 * np.pi * frequency * t)
 
         # wavedata = self.remove_low_frequencies(wavedata, AUDIO_SAMPLING_RATE, cutoff_frequency=16000)
-        wavedata = self.bandpass_filter(wavedata, [16000, 30000], AUDIO_SAMPLING_RATE)
+        # wavedata = self.bandpass_filter(wavedata, [16000, 30000], AUDIO_SAMPLING_RATE)
         # wavedata = self.bandpass_filter(wavedata, [200, 18000], AUDIO_SAMPLING_RATE)
         # wavedata = self.remove_low_frequencies(wavedata, AUDIO_SAMPLING_RATE, cutoff_frequency=7000)
+
+        wavedata = self.synth.generate_constant_wave(frequency=frequency, length=duration)
 
         self.logger.debug("Finish audio data generation")
         return wavedata
@@ -70,10 +73,12 @@ if __name__ == "__main__":
     FREQUENCY = 20000
     DURATION = 1000
 
-    sound_controller = SoundController()
+    import synthesizer
 
-    waveform = sound_controller.generate_audio_frames(FREQUENCY)
-    start_time = time.time()
-    print("play")
-    sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=waveform)
-    print(f"Elapsed: {time.time() -start_time}")
+    synt = synthesizer.Synthesizer(rate=192000)
+
+    wave = synt.generate_constant_wave(27000, 10)
+    print('sad')
+
+    sound_controller = SoundController()
+    sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=wave)

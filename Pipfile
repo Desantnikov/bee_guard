@@ -18,6 +18,9 @@ black = "*"
 isort = "*"
 strenum = "*"
 jupyter = "*"
+simpleaudio = "*"
+synthesizer = "*"
+calcwave = "*"
 
 [dev-packages]
 snakeviz = "*"

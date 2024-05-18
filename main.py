@@ -29,7 +29,7 @@ from logger_setup import setup_logger
 """
 TODO: 
     + high frequency playback
-    link packets and frequencies
+    + link packets and frequencies
     filter noise when playback
     make packets collecting and sound playback time equal
     + handle drone-pc communication breakdown

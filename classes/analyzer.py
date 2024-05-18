@@ -80,6 +80,7 @@ class Analyzer(LoggerMixin):
         plt.ylabel(data_label)
         plt.xlabel(x_axis)
 
+        # plt.stem(self.packets_df, 'r', )# showing the exact location of the smaples
 
         # plt.sca(.get_matrix())
         # plt.set_xticks(np.arange(0, 24, 1))
