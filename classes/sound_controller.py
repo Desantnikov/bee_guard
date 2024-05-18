@@ -76,9 +76,22 @@ if __name__ == "__main__":
     import synthesizer
 
     synt = synthesizer.Synthesizer(rate=192000)
+    sound_controller = SoundController()
+    while True:
+        sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(25450, 0.1))
+        # time.sleep(0.1)
+        sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION,
+                                        frames=synt.generate_constant_wave(25425, 0.1))
+        time.sleep(0.1)
 
-    wave = synt.generate_constant_wave(27000, 10)
+    wave_25425 = synt.generate_constant_wave(25450, 5)
+    wave_25450 = synt.generate_constant_wave(25450, 5)
+
+    waves = [wave_25400, wave_25425, wave_25450]
+
     print('sad')
 
-    sound_controller = SoundController()
-    sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=wave)
+
+    # sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(20000, 5))
+    for i in range(100):
+        sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=waves[i % 2])

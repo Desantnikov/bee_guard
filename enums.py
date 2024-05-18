@@ -23,3 +23,5 @@ class PositionFieldNames(StrEnum):
     X_GYRO = "xgyro"
     Y_GYRO = "ygyro"
     Z_GYRO = "zgyro"
+
+    TEMPERATURE = "temperature"
