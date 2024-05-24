@@ -1,9 +1,10 @@
 import threading
 import time
-import synthesizer
+
 import numpy as np
 import pyaudio
 import scipy
+import synthesizer
 
 from classes.logger_mixin import LoggerMixin
 from constants import AUDIO_CHANNELS, AUDIO_FORMAT, AUDIO_SAMPLING_RATE
@@ -78,20 +79,25 @@ if __name__ == "__main__":
     synt = synthesizer.Synthesizer(rate=192000)
     sound_controller = SoundController()
     while True:
-        sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(25450, 0.1))
+        sound_controller.playback_start(
+            frequency=FREQUENCY,
+            duration=DURATION,
+            frames=synt.generate_constant_wave(25450, 0.1),
+        )
         # time.sleep(0.1)
         sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION,
                                         frames=synt.generate_constant_wave(25425, 0.1))
         time.sleep(0.1)
 
-    wave_25425 = synt.generate_constant_wave(25450, 5)
-    wave_25450 = synt.generate_constant_wave(25450, 5)
+    # wave_25425 = synt.generate_constant_wave(25450, 5)
+    # wave_25450 = synt.generate_constant_wave(25450, 5)
+    #
+    # waves = [wave_25400, wave_25425, wave_25450]
+    #
+    # print('sad')
 
-    waves = [wave_25400, wave_25425, wave_25450]
 
-    print('sad')
-
-
-    # sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(20000, 5))
-    for i in range(100):
-        sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=waves[i % 2])
+    # sound_controller.playback_start(
+    #     frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(20000, 5))
+    # for i in range(100):
+    #     sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION, frames=waves[i % 2])

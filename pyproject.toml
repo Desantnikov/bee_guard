@@ -1,3 +1,33 @@
+[tool.poetry]
+name = "bee_guard"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.2.2"
+pymavlink = "^2.4.41"
+matplotlib = "^3.9.0"
+scipy = "^1.13.1"
+pyaudio = "^0.2.14"
+strenum = "^0.4.15"
+synthesizer = "^0.2.0"
+pyserial = "^3.5"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.5"
+black = "^24.4.2"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
 [tool.ruff]
 line-length = 120
 extend-select = [
@@ -8,7 +38,7 @@ extend-select = [
     "SIM",  # flake8-simplify
     "I",  # isort
 ]
-exclude = ["./mock_data", "./firmwares", "./configs", "./collected_data"]
+exclude = ["./mock_data", "./firmwares", "./configs", "./collected_data", "./logs"]
 
 [tool.black]
 line-length = 120

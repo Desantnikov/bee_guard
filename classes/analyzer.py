@@ -2,7 +2,6 @@ import datetime
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
-import matplotlib.scale
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -73,7 +72,8 @@ class Analyzer(LoggerMixin):
 
         plt.figure(figsize=(12, 6))
         for column_name in columns_to_show:
-            plt.plot(self.packets_df[x_axis], self.packets_df[column_name], label=column_name)#, scale=matplotlib.scale.FuncTransform(forward=fw, inverse=bkw))
+            plt.plot(self.packets_df[x_axis], self.packets_df[column_name], label=column_name
+                     )#, scale=matplotlib.scale.FuncTransform(forward=fw, inverse=bkw))
 
         data_label = columns_to_show[0].name if len(columns_to_show) == 1 else "values"
 

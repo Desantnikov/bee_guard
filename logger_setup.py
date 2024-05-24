@@ -1,4 +1,5 @@
 import logging
+import os
 
 from constants import LOGS_FOLDER
 
@@ -10,6 +11,9 @@ class FindFontFilter(logging.Filter):
 
 
 def setup_logger(log_file_name, log_level):
+    if not os.path.exists(LOGS_FOLDER):
+        os.mkdir(LOGS_FOLDER)
+
     logger = logging.getLogger()
     logger.setLevel(log_level)
 
