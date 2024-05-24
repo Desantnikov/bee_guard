@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from pymavlink import mavutil
 
-from enums import MavlinkPacketTypes
 from classes.analyzer import Analyzer
 from classes.drone_controller import DroneController, MockedDroneController
 from classes.sound_controller import SoundController
@@ -22,8 +21,7 @@ from constants import (
     PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     RESET_INPUT_BUFFER,
     SHOW_PLOTS,
-    TIME_SINCE_BOOT_COL_NAME,
-TIME_ELAPSED_COL_NAME
+    TIME_ELAPSED_COL_NAME,
 )
 from enums import PositionFieldNames
 from logger_setup import setup_logger
@@ -93,7 +91,7 @@ def launch():
     drone_controller = drone_controller_cls(
         serial_port=MAVLINK_SERIAL_PORT,
         baudrate=MAVLINK_SERIAL_BAUDRATE,
-        default_exclude_fields=["id", "xmag", "ymag", "zmag"], #"mavpackettype"],  # TODO: Move to constants?
+        default_exclude_fields=["id", "xmag", "ymag", "zmag"],  # "mavpackettype"],  # TODO: Move to constants?
         do_reset_input_buffer=RESET_INPUT_BUFFER,
     )
 
@@ -169,7 +167,6 @@ def launch():
         for _, column_enum in PositionFieldNames.members():
             analyzer.show_plot(columns_to_show=[column_enum], x_axis=FREQUENCY_COL_NAME)
 
-
     logger.info("FINISH")
 
 
@@ -179,4 +176,4 @@ if __name__ == "__main__":
     except Exception:
         logger.exception(msg="Exception", exc_info=True)
         breakpoint()
-        print('ASDASD')
+        print("ASDASD")

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
@@ -46,7 +46,7 @@ class Analyzer(LoggerMixin):
         )
 
     def save_packets(self):
-        saved_file_name = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")  # TODO: Move saving to analyzer class
+        saved_file_name = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")  # TODO: Move saving to analyzer class
         saved_file_path = f"./{COLLECTED_DATA_FOLDER}/{saved_file_name}.csv"
 
         self.packets_df.to_csv(saved_file_path)
@@ -57,7 +57,10 @@ class Analyzer(LoggerMixin):
         self.packets_df[FREQUENCY_COL_NAME] = self.packets_df[FREQUENCY_COL_NAME].fillna(frequency)
 
     def convert_timestamp_to_datetime(self):
-        self.packets_df[TIME_ELAPSED_COL_NAME] = pd.to_datetime(self.packets_df['time_usec'], unit='us').dt.strftime("%H:%M:%S.%f")
+        self.packets_df[TIME_ELAPSED_COL_NAME] = pd.to_datetime(
+            self.packets_df["time_usec"],
+            unit="us",
+        ).dt.strftime("%H:%M:%S.%f")
 
     def calc_zscore_outliners(self):
         """
@@ -73,14 +76,16 @@ class Analyzer(LoggerMixin):
 
     def show_plot(self, columns_to_show: List[PositionFieldNames], x_axis: str):
         def fw(*args, **kwargs):
-            print('asdasd')
+            print("asdasd")
+
         def bkw(*args, **kwargs):
-            print('asdasd')
+            print("asdasd")
 
         plt.figure(figsize=(12, 6))
         for column_name in columns_to_show:
-            plt.plot(self.packets_df[x_axis], self.packets_df[column_name], label=column_name
-                     )#, scale=matplotlib.scale.FuncTransform(forward=fw, inverse=bkw))
+            plt.plot(
+                self.packets_df[x_axis], self.packets_df[column_name], label=column_name
+            )  # , scale=matplotlib.scale.FuncTransform(forward=fw, inverse=bkw))
 
         data_label = columns_to_show[0].name if len(columns_to_show) == 1 else "values"
 
@@ -96,5 +101,4 @@ class Analyzer(LoggerMixin):
         plt.legend()
         plt.grid(which="both")
         plt.show()
-        self.logger.debug('Plot drawing finished')
-
+        self.logger.debug("Plot drawing finished")

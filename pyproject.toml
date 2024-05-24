@@ -19,7 +19,7 @@ pyserial = "^3.5"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.5"
-black = "^24.4.2"
+black = {extras = ["jupyter"], version = "^24.4.2"}
 isort = "^5.13.2"
 flake8 = "^7.0.0"
 

@@ -85,8 +85,9 @@ if __name__ == "__main__":
             frames=synt.generate_constant_wave(25450, 0.1),
         )
         # time.sleep(0.1)
-        sound_controller.playback_start(frequency=FREQUENCY, duration=DURATION,
-                                        frames=synt.generate_constant_wave(25425, 0.1))
+        sound_controller.playback_start(
+            frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(25425, 0.1)
+        )
         time.sleep(0.1)
 
     # wave_25425 = synt.generate_constant_wave(25450, 5)
@@ -95,7 +96,6 @@ if __name__ == "__main__":
     # waves = [wave_25400, wave_25425, wave_25450]
     #
     # print('sad')
-
 
     # sound_controller.playback_start(
     #     frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(20000, 5))
