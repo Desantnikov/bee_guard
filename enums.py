@@ -7,8 +7,11 @@ else:
 
 
 class MavlinkPacketTypes(StrEnum):
-    RAW_IMU = "RAW_IMU"
-    MAVLINK_MSG_ID_HIGHRES_IMU = "MAVLINK_MSG_ID_HIGHRES_IMU"  # TODO: Check if real packet type
+    RAW_IMU = "RAW_IMU"  # raw data from default position sensor (first)
+    SCALED_IMU = "SCALED_IMU"  # raw data from first sensor
+    SCALED_IMU2 = "SCALED_IMU2"  # raw data from second sensor
+
+    SYSTEM_TIME = "SYSTEM_TIME"
 
 
 class PositionFieldNames(StrEnum):

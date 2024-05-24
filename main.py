@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from pymavlink import mavutil
 
+from enums import MavlinkPacketTypes
 from classes.analyzer import Analyzer
 from classes.drone_controller import DroneController, MockedDroneController
 from classes.sound_controller import SoundController
@@ -21,7 +22,8 @@ from constants import (
     PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     RESET_INPUT_BUFFER,
     SHOW_PLOTS,
-    TIME_COL_NAME,
+    TIME_SINCE_BOOT_COL_NAME,
+TIME_ELAPSED_COL_NAME
 )
 from enums import PositionFieldNames
 from logger_setup import setup_logger
@@ -30,6 +32,8 @@ from logger_setup import setup_logger
 TODO: 
     + high frequency playback
     + link packets and frequencies
+    + link packets and system time
+    + set system time on startup
     filter noise when playback
     make packets collecting and sound playback time equal
     + handle drone-pc communication breakdown
@@ -46,7 +50,7 @@ TODO:
     refactor importing StrEnum
     use mock drone data if script launched with "--mock" parameter 
     
-    migrate to poetry
+     + migrate to poetry
     
 """
 
@@ -77,8 +81,10 @@ setup_logger(log_file_name=LOG_FILE_NAME, log_level=logging.DEBUG)  # TODO: Move
 logger = logging.getLogger("main")
 
 analyzer = None
+
+
 def launch():
-    logger.info("TEST")
+    logger.info("START")
 
     drone_controller_cls = DroneController
     if MOCK_DRONE_CONTROLLER:  # use fake wrapper returning sample data if enabled
@@ -87,7 +93,7 @@ def launch():
     drone_controller = drone_controller_cls(
         serial_port=MAVLINK_SERIAL_PORT,
         baudrate=MAVLINK_SERIAL_BAUDRATE,
-        default_exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],  # TODO: Move to constants?
+        default_exclude_fields=["id", "xmag", "ymag", "zmag"], #"mavpackettype"],  # TODO: Move to constants?
         do_reset_input_buffer=RESET_INPUT_BUFFER,
     )
 
@@ -96,6 +102,8 @@ def launch():
         message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
         frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     )
+
+    drone_controller.request_system_time()
 
     # read first X packets without sound enabled to use as a reference data
     reference_packet_dicts = drone_controller.receive_multiple_packet_dicts(
@@ -110,7 +118,7 @@ def launch():
     while current_audio_frequency <= AUDIO_FREQUENCY_LIMIT:
         drone_controller.clear_input_buffer()  # clear all input packets before iteration
 
-        logger.info(f"\r\n\r\nStart {current_audio_frequency}Hz test:\r\n---------------------------------------------")
+        logger.info(f"\r\n\r\nStart {current_audio_frequency}Hz test:\r\n-----------------------------------------")
 
         duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
         sound_controller.playback_start_threaded(
@@ -122,11 +130,11 @@ def launch():
             packets_read_amount=PACKETS_TO_COLLECT_WITH_AUDIO,
         )
         analyzer.append_packets(packets_dicts=packets_dicts)
-        analyzer.update_frequency_col(frequency=current_audio_frequency)
+        analyzer.fill_frequency_column(frequency=current_audio_frequency)
 
         sound_controller.playback_thread.join()
 
-        logger.info(f"Stop {current_audio_frequency}Hz test ---------------------------")
+        logger.info(f"Stop {current_audio_frequency}Hz test:\r\n-----------------------------------------")
         current_audio_frequency += AUDIO_FREQUENCY_STEP
 
     logger.info(
@@ -150,15 +158,17 @@ def launch():
         f"{analyzer.calc_zscore_outliners()}"
     )
 
+    analyzer.convert_timestamp_to_datetime()
     analyzer.save_packets()
 
     if SHOW_PLOTS:
         # draw separate plot for each column with time on X axis
         for _, column_enum in PositionFieldNames.members():
-            analyzer.show_plot(columns_to_show=[column_enum], x_axis=TIME_COL_NAME)
+            analyzer.show_plot(columns_to_show=[column_enum], x_axis=TIME_ELAPSED_COL_NAME)
         # draw separate plot for each column with frequency on X axis
         for _, column_enum in PositionFieldNames.members():
             analyzer.show_plot(columns_to_show=[column_enum], x_axis=FREQUENCY_COL_NAME)
+
 
     logger.info("FINISH")
 
@@ -169,3 +179,4 @@ if __name__ == "__main__":
     except Exception:
         logger.exception(msg="Exception", exc_info=True)
         breakpoint()
+        print('ASDASD')

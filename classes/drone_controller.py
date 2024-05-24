@@ -5,6 +5,8 @@ from typing import List
 import pandas as pd
 from pymavlink import mavutil
 
+import datetime
+from enums import MavlinkPacketTypes
 from classes.logger_mixin import LoggerMixin
 from constants import LOGS_FOLDER, MOCK_DATA_FOLDER
 
@@ -23,13 +25,23 @@ class DroneController(LoggerMixin):
     ):
         super().__init__(serial_port, baudrate, default_exclude_fields, do_reset_input_buffer)
 
-        self.connection = mavutil.mavlink_connection(serial_port, baud=baudrate)
+        self.serial_port = serial_port
+        self.baudrate = baudrate
+
+        self.connection = mavutil.mavlink_connection(device=self.serial_port, baud=self.baudrate, zero_time_base=True)
         self.connection.wait_heartbeat(blocking=True, timeout=15)
         self.logger.info("Connected to drone_controller")
+
+        self.set_system_time()
 
         self.default_exclude_fields = default_exclude_fields
         self.do_reset_input_buffer = do_reset_input_buffer
         self.connection.setup_logfile(f"{LOGS_FOLDER}/mavlink_logs.log")
+
+    def set_system_time(self):
+        unix_time = int(time.time())
+        time_usec = unix_time * 1000000  # convert to microseconds
+        self.connection.mav.system_time_send(time_usec, unix_time)  # set system time
 
     def receive_packet_dict(self, packet_type: str = None, blocking: bool = True, exclude_fields: List[str] = None):
         packet = self.connection.recv_match(type=packet_type, blocking=blocking, timeout=30)
@@ -98,6 +110,10 @@ class DroneController(LoggerMixin):
             message_id (int): MAVLink message ID
             frequency_hz (float): Desired frequency in Hz
         """
+        self.logger.info(f'Requesting message "{mavutil.mavlink.mavlink_map[message_id].msgname}" '
+                         f'with id "{message_id}" '
+                         f'update interval {frequency_hz}hz')
+
         self.connection.mav.command_long_send(
             self.connection.target_system,
             self.connection.target_component,
@@ -113,6 +129,21 @@ class DroneController(LoggerMixin):
             0,  # Target address of message stream (if message has target address fields).
             # 0: Flight-stack default (recommended), 1: address of requestor, 2: broadcast.
         )
+
+    def request_system_time(self):
+        self.logger.info("Get SYSTEM_TIME from drone")
+        self.connection.mav.command_long_send(
+            self.connection.target_system,
+            self.connection.target_component,
+            mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,
+            0,  # confirmation
+            mavutil.mavlink.MAVLINK_MSG_ID_SYSTEM_TIME,  # message id to request
+            0, 0, 0, 0, 0, 0  # unused parameters
+        )
+        system_time_packet = self.receive_packet_dict(packet_type=MavlinkPacketTypes.SYSTEM_TIME, blocking=True)
+        self.logger.debug(f"Raw SYSTEM_TIME packet : {system_time_packet}")
+        self.logger.info(f"System time: {datetime.datetime.fromtimestamp(int(system_time_packet['time_unix_usec'] / 1000000)).strftime("%Y-%m-%d %H-%M-%S")}")
+        self.logger.info(f"Time from boot: {datetime.datetime.fromtimestamp(int(system_time_packet['time_boot_ms'] / 1000)).strftime("%Hhr %Mmin %Ssec")}")
 
     def clear_input_buffer(self):
         received = True
@@ -147,3 +178,44 @@ class MockedDroneController(DroneController):
 
     def clear_input_buffer(self):
         pass
+
+
+if __name__ == "__main__":
+    drone_controller = DroneController(
+        serial_port='COM9',
+        baudrate=921600,
+        # default_exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],  # TODO: Move to constants?
+        do_reset_input_buffer=True,
+    )
+    from enums import MavlinkPacketTypes
+    import pprint
+
+
+    # # set RAW_IMU message update frequency
+    # drone_controller.request_message_interval(
+    #     message_id=mavutil.mavlink.MAVLINK_MSG_ID_SCALED_IMU,
+    #     frequency_hz=1,
+    # )
+    # # set RAW_IMU message update frequency
+    # drone_controller.request_message_interval(
+    #     message_id=mavutil.mavlink.MAVLINK_MSG_ID_SCALED_IMU2,
+    #     frequency_hz=1,
+    # )
+    # set RAW_IMU message update frequency
+    drone_controller.request_message_interval(
+        message_id=mavutil.mavlink.MAVLINK_MSG_ID_HIGHRES_IMU,
+        frequency_hz=1,
+    )
+
+
+
+    while True:
+        print('Wait for packet')
+        # packet = drone_controller.receive_multiple_packet_dicts(packet_type=MavlinkPacketTypes.RAW_IMU, packets_read_amount=20)
+
+        packet_imu_1 = drone_controller.receive_packet_dict(
+                    # packet_type=MavlinkPacketTypes.HIGHRES_IMU,
+                    # exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],
+                )
+        pprint.pprint(packet_imu_1)
+        # print(packet)

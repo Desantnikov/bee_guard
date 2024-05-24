@@ -7,7 +7,7 @@ import pandas as pd
 from scipy import stats
 
 from classes.logger_mixin import LoggerMixin
-from constants import COLLECTED_DATA_FOLDER, FREQUENCY_COL_NAME
+from constants import COLLECTED_DATA_FOLDER, FREQUENCY_COL_NAME, TIME_ELAPSED_COL_NAME
 from enums import PositionFieldNames
 
 
@@ -18,15 +18,15 @@ class Analyzer(LoggerMixin):
         # first batch of packets should be a reference batch without audio enabled
         self.packets_df = pd.DataFrame(packets_dicts)
 
+        # only numeric columns
+        self.packets_df_numeric = self.packets_df.select_dtypes(include=[np.number])
+
         # add `Frequency` column
         if FREQUENCY_COL_NAME not in self.packets_df.columns.values:
             self.packets_df.insert(2, FREQUENCY_COL_NAME, len(self.packets_df) * [0], True)
 
         self.z_score_threshold = 3
         self.z_score_outliners = None
-
-    # def _add_frequency_column(self):
-
 
     def append_packets(self, packets_dicts: List[Dict]):
         self.logger.info(f"Packets amount: {len(self.packets_df)}")
@@ -42,7 +42,7 @@ class Analyzer(LoggerMixin):
         self.logger.info(
             f"\r\nRolling standard deviatio for each value:\r\n"
             f"---------------------------------------------\r\n"
-            f"{self.packets_df.std()}"
+            f"{self.packets_df_numeric.std()}"
         )
 
     def save_packets(self):
@@ -52,6 +52,13 @@ class Analyzer(LoggerMixin):
         self.packets_df.to_csv(saved_file_path)
         self.logger.info(f"Saved data to {saved_file_path}")
 
+    def fill_frequency_column(self, frequency: int):
+        # fill `frequency` column for last packets batch (without frequency set)
+        self.packets_df[FREQUENCY_COL_NAME] = self.packets_df[FREQUENCY_COL_NAME].fillna(frequency)
+
+    def convert_timestamp_to_datetime(self):
+        self.packets_df[TIME_ELAPSED_COL_NAME] = pd.to_datetime(self.packets_df['time_usec'], unit='us').dt.strftime("%H:%M:%S.%f")
+
     def calc_zscore_outliners(self):
         """
         A positive z-score indicates the raw score is higher than the mean average.
@@ -59,8 +66,8 @@ class Analyzer(LoggerMixin):
         A negative z-score reveals the raw score is below the mean average.
         For example, if a z-score is equal to -2, it is two standard deviations below the mean.
         """
-        z = np.abs(stats.zscore(self.packets_df))
-        self.z_score_outliners = self.packets_df[z > self.z_score_threshold].dropna(how="all")
+        z = np.abs(stats.zscore(self.packets_df_numeric))
+        self.z_score_outliners = self.packets_df_numeric[z > self.z_score_threshold].dropna(how="all")
 
         return self.z_score_outliners
 
@@ -91,6 +98,3 @@ class Analyzer(LoggerMixin):
         plt.show()
         self.logger.debug('Plot drawing finished')
 
-    def update_frequency_col(self, frequency: int):
-        # set provided frequency values_list for last packets batch (without frequcny set)
-        self.packets_df[FREQUENCY_COL_NAME] = self.packets_df[FREQUENCY_COL_NAME].fillna(frequency)
