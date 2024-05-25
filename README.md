@@ -15,9 +15,13 @@ Also adjust sampling rates
          32 Bit Arm® Cortex®-M3, 72MHz, 64KB SRAM
     On-board sensors
         Accel/Gyro: ICM-42688-P
-        Accel/Gyro: BMI055
+        Accel/Gyro: BMI055  (https://www.mouser.com/datasheet/2/783/BST-BMI055-DS000-08-786482.pdf)
         Mag: IST8310
         Barometer: MS5611
+    
+
+BMI055
+Gyro Low-pass filter bandwidths 230Hz - 12Hz
 
 To influence `x_gyro` and `y_gyro` data for IMU1 (idk if it's ICM-42688-P or BMI055) produce ~200Hz (+- 50Hz)
 repeated sounds
