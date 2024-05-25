@@ -108,7 +108,9 @@ def launch():
         packets_read_amount=PACKETS_TO_COLLECT_WITHOUT_AUDIO,
     )
 
+    global analyzer  # w/a to make analyzer accessible from outer try/except to persist collected data if errors
     analyzer = Analyzer(packets_dicts=reference_packet_dicts)
+
     sound_controller = SoundController()
 
     current_audio_frequency = INITIAL_AUDIO_FREQUENCY
@@ -175,5 +177,6 @@ if __name__ == "__main__":
 
     except BaseException:  # BaseException to catch also when stopped via pycharm (a.k.a. KeyboardInterrupt exception)
         logger.exception(msg="Exception", exc_info=True)
+
         breakpoint()
         print("ASDASD")

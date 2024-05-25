@@ -158,7 +158,7 @@ class DroneController(LoggerMixin):
 
         if self.last_system_time_packet["time_boot_ms"] > system_time_packet["time_boot_ms"]:
             # increment counter to show it in final results
-            self.execution_info['reboots_amount'] = self.execution_info.get('reboots_amount', 0) + 1
+            self.execution_info["reboots_amount"] = self.execution_info.get("reboots_amount", 0) + 1
 
             self.logger.error(
                 f"POSSIBLE REBOOT DETECTED\r\n"
