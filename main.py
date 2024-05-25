@@ -40,6 +40,7 @@ TODO:
     adjust drawing plots
     
     + add logging
+    instead of setting RAW_IMU packet interval try requesting these packets one by one, like for SYSTEM_TIME?
     create new "<start_time>_mavlink_logs.log" file for each run
     + remove parent try/except
      
@@ -88,7 +89,7 @@ def launch():
     logger.info("START")
 
     drone_controller_cls = DroneController
-    if MOCK_DRONE_CONTROLLER:  # use fake wrapper returning sample data if enabled
+    if MOCK_DRONE_CONTROLLER:  # use fake wrapper returning mock data if enabled
         drone_controller_cls = MockedDroneController
 
     drone_controller = drone_controller_cls(
@@ -122,11 +123,9 @@ def launch():
         logger.info(f"\r\n\r\nStart {current_audio_frequency}Hz test:\r\n-----------------------------------------")
 
         duration = int((PACKETS_TO_COLLECT_WITH_AUDIO / PACKET_TYPE_UPDATE_RATE_TO_REQUEST) + 2)
-        sound_controller.playback_start_threaded(
-            frequency=current_audio_frequency, duration=duration
-        )  # audio playback in separate thread
+        sound_controller.playback_start_threaded(frequency=current_audio_frequency, duration=duration)
 
-        packets_dicts = drone_controller.receive_multiple_packet_dicts(  # read X packets to use as a reference
+        packets_dicts = drone_controller.receive_multiple_packet_dicts(
             packet_type=PACKET_TYPE_TO_ANALYZE,
             packets_read_amount=PACKETS_TO_COLLECT_WITH_AUDIO,
         )
@@ -134,7 +133,6 @@ def launch():
         analyzer.fill_frequency_column(frequency=current_audio_frequency)
 
         sound_controller.playback_thread.join()
-
         logger.info(f"Stop {current_audio_frequency}Hz test:\r\n-----------------------------------------")
 
         current_audio_frequency += AUDIO_FREQUENCY_STEP
@@ -145,31 +143,15 @@ def launch():
             logger.info(f"Limit frequency reached in ({repeated_times}/{REPEAT_TIMES})th iteration, start again")
             current_audio_frequency = INITIAL_AUDIO_FREQUENCY
 
-    logger.info(
-        f"----------------------------------------------\r\n"
-        f"Audio tests finished, tested frequencies {INITIAL_AUDIO_FREQUENCY}Hz - {AUDIO_FREQUENCY_LIMIT}Hz; "
-        f"Step {AUDIO_FREQUENCY_STEP}\r\n"
-        f"----------------------------------------------\r\n"
-    )
-
-    logger.info(
-        f"\r\n"
-        f"Anomalies:\r\n"
-        f"----------------------------------------------------------\r\n"
-        f"{analyzer.describe_packets()}"
-    )
-
-    logger.info(
-        f"\r\n"
-        f"Z-Score outliners:\r\n"
-        f"----------------------------------------------------------\r\n"
-        f"{analyzer.calc_zscore_outliners()}"
-    )
+    logger.info(f"\r\nTested {INITIAL_AUDIO_FREQUENCY}-{AUDIO_FREQUENCY_LIMIT} Hz, step {AUDIO_FREQUENCY_STEP}\r\n")
 
     analyzer.convert_timestamp_to_datetime()
     analyzer.save_packets()
 
-    if SHOW_PLOTS:
+    if SHOW_PLOTS:  # TODO: Move to jupyter nootebook
+        logger.info(f"\r\nAnomalies:\r\n--------------------------------------\r\n{analyzer.describe_packets()}")
+        logger.info(f"\r\nZ-Score outliners:\r\n------------------------------\r\n{analyzer.calc_zscore_outliners()}")
+
         # draw separate plot for each column with time on X axis
         for _, column_enum in PositionFieldNames.members():
             analyzer.show_plot(columns_to_show=[column_enum], x_axis=TIME_ELAPSED_COL_NAME)
@@ -177,7 +159,7 @@ def launch():
         for _, column_enum in PositionFieldNames.members():
             analyzer.show_plot(columns_to_show=[column_enum], x_axis=FREQUENCY_COL_NAME)
 
-    logger.info("FINISH")
+    logger.info("\r\nFINISH\r\n")
 
 
 if __name__ == "__main__":
