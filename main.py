@@ -32,6 +32,7 @@ TODO:
     + link packets and frequencies
     + link packets and system time
     + set system time on startup
+    + check `time_boot_ms` to detect unexpected reboot
     filter noise when playback
     make packets collecting and sound playback time equal
     + handle drone-pc communication breakdown
@@ -100,8 +101,6 @@ def launch():
         message_id=mavutil.mavlink.MAVLINK_MSG_ID_RAW_IMU,
         frequency_hz=PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     )
-
-    drone_controller.request_system_time()
 
     # read first X packets without sound enabled to use as a reference data
     reference_packet_dicts = drone_controller.receive_multiple_packet_dicts(
@@ -173,7 +172,8 @@ def launch():
 if __name__ == "__main__":
     try:
         launch()
-    except Exception:
+
+    except BaseException:  # BaseException to catch also when stopped via pycharm (a.k.a. KeyboardInterrupt exception)
         logger.exception(msg="Exception", exc_info=True)
         breakpoint()
         print("ASDASD")

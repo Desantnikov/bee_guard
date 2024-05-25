@@ -7,7 +7,7 @@ import pandas as pd
 from pymavlink import mavutil
 
 from classes.logger_mixin import LoggerMixin
-from constants import LOGS_FOLDER, MOCK_DATA_FOLDER
+from constants import MOCK_DATA_FOLDER
 from enums import MavlinkPacketTypes
 
 
@@ -32,25 +32,28 @@ class DroneController(LoggerMixin):
         self.connection.wait_heartbeat(blocking=True, timeout=15)
         self.logger.info("Connected to drone_controller")
 
+        # TODO: Create separate class and use composition here
+        self.execution_info = {}  # info like `reboots_amount` and other to show in final results
+
+        self.last_system_time_packet = None
         self.set_system_time()
+        self.request_system_time()
 
         self.default_exclude_fields = default_exclude_fields
         self.do_reset_input_buffer = do_reset_input_buffer
-        self.connection.setup_logfile(f"{LOGS_FOLDER}/mavlink_logs.log")
+        # self.connection.setup_logfile(f"{LOGS_FOLDER}/mavlink_logs.log")
 
     def set_system_time(self):
         unix_time = int(time.time())
         time_usec = unix_time * 1000000  # convert to microseconds
         self.connection.mav.system_time_send(time_usec, unix_time)  # set system time
+        self.logger.info("System time command sent")
+        self.logger.debug(f"SET: time_usec {time_usec}, unix_time {unix_time}")
 
     def receive_packet_dict(self, packet_type: str = None, blocking: bool = True, exclude_fields: List[str] = None):
         packet = self.connection.recv_match(type=packet_type, blocking=blocking, timeout=30)
 
-        # self.logger.info(f'Mav count: {cls.connection.mav_count}. Packet utime: {packet.time_usec}')
-
         packet_dict = packet.to_dict()
-
-        # self.logger.info(f'Received packet\r\nutime: {packet.time_usec}; seq: {packet._header.seq}')
 
         if exclude_fields is not None:
             for field_name in exclude_fields:
@@ -73,7 +76,7 @@ class DroneController(LoggerMixin):
         start_time = time.time()
 
         if self.do_reset_input_buffer:
-            self.logger.info("Resetting input buffer")
+            self.logger.info("Reset input buffer")
             self.connection.port.reset_input_buffer()
 
         packet_dicts_batch = []
@@ -97,6 +100,7 @@ class DroneController(LoggerMixin):
 
         total_time = time.time() - start_time
         self.logger.info(f"Total received packets: {len(packet_dicts_batch)}. Time: {total_time}")
+        self.request_system_time()
 
         return packet_dicts_batch
 
@@ -133,7 +137,7 @@ class DroneController(LoggerMixin):
         )
 
     def request_system_time(self):
-        self.logger.info("Get SYSTEM_TIME from drone")
+        self.logger.info("Send SYSTEM_TIME request")
         self.connection.mav.command_long_send(
             self.connection.target_system,
             self.connection.target_component,
@@ -148,14 +152,28 @@ class DroneController(LoggerMixin):
             0,  # unused parameters
         )
         system_time_packet = self.receive_packet_dict(packet_type=MavlinkPacketTypes.SYSTEM_TIME, blocking=True)
-        self.logger.debug(f"Raw SYSTEM_TIME packet : {system_time_packet}")
+        if self.last_system_time_packet is None:
+            self.last_system_time_packet = system_time_packet
+            self.logger.info("No previous SYSTEM_TIME packet saved, save current")
+
+        if self.last_system_time_packet["time_boot_ms"] > system_time_packet["time_boot_ms"]:
+            # increment counter to show it in final results
+            self.execution_info['reboots_amount'] = self.execution_info.get('reboots_amount', 0) + 1
+
+            self.logger.error(
+                f"POSSIBLE REBOOT DETECTED\r\n"
+                f"Current `time_boot_ms` > previous `time_boot_ms`\r\n"
+                f"SYSTEM_TIME {system_time_packet}, last SYSTEM_TIME {self.last_system_time_packet}"
+            )
+            self.set_system_time()
+
+        self.last_system_time_packet = system_time_packet
+
         self.logger.info(
             f"System time: {datetime.fromtimestamp(
-                int(system_time_packet['time_unix_usec'] / 1000000)).strftime("%Y-%m-%d %H-%M-%S")}"
-        )
-        self.logger.info(
-            f"Time from boot: {datetime.fromtimestamp(
-                int(system_time_packet['time_boot_ms'] / 1000)).strftime("%Hhr %Mmin %Ssec")}"
+                self.last_system_time_packet['time_unix_usec'] / 1000000).strftime("%Y-%m-%d %H:%M:%S.%f")} "
+            f"Time from boot: {(datetime.fromtimestamp(
+                self.last_system_time_packet['time_boot_ms'] / 1000) - datetime.fromtimestamp(0)).total_seconds()} sec"
         )
 
     def clear_input_buffer(self):
@@ -200,10 +218,12 @@ if __name__ == "__main__":
         # default_exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],  # TODO: Move to constants?
         do_reset_input_buffer=True,
     )
-    import pprint
+    import logging
 
     from enums import MavlinkPacketTypes
+    from logger_setup import setup_logger
 
+    setup_logger(log_file_name="test.log", log_level=logging.DEBUG)  # TODO: Move to setup
     # # set RAW_IMU message update frequency
     # drone_controller.request_message_interval(
     #     message_id=mavutil.mavlink.MAVLINK_MSG_ID_SCALED_IMU,
@@ -215,19 +235,20 @@ if __name__ == "__main__":
     #     frequency_hz=1,
     # )
     # set RAW_IMU message update frequency
-    drone_controller.request_message_interval(
-        message_id=mavutil.mavlink.MAVLINK_MSG_ID_HIGHRES_IMU,
-        frequency_hz=1,
-    )
+    # drone_controller.request_message_interval(
+    #     message_id=mavutil.mavlink.MAVLINK_MSG_ID_SYSTEM_TIME,
+    #     frequency_hz=1,
+    # )
 
     while True:
-        print("Wait for packet")
+        # print("Wait for packet")
         # packet = drone_controller.receive_multiple_packet_dicts(
         #     packet_type=MavlinkPacketTypes.RAW_IMU, packets_read_amount=20)
 
-        packet_imu_1 = drone_controller.receive_packet_dict(
-            # packet_type=MavlinkPacketTypes.HIGHRES_IMU,
-            # exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],
-        )
-        pprint.pprint(packet_imu_1)
+        # packet_imu_1 = drone_controller.receive_packet_dict(
+        #     packet_type=MavlinkPacketTypes.SYSTEM_TIME,
+        #     exclude_fields=["mavpackettype", "id", "xmag", "ymag", "zmag"],
+        # )
+        drone_controller.request_system_time()
+        # pprint.pprint(packet_imu_1)
         # print(packet)
