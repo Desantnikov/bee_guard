@@ -1,5 +1,4 @@
 import threading
-import time
 
 import numpy as np
 import pyaudio
@@ -71,24 +70,27 @@ class SoundController(LoggerMixin):
 
 
 if __name__ == "__main__":
-    FREQUENCY = 20000
-    DURATION = 1000
+    # FREQUENCY = 20000
+    # DURATION = 1000
 
-    import synthesizer
+    # import synthesizer
 
-    synt = synthesizer.Synthesizer(rate=192000)
+    # synt = synthesizer.Synthesizer(rate=192000)
     sound_controller = SoundController()
     while True:
-        sound_controller.playback_start(
-            frequency=FREQUENCY,
-            duration=DURATION,
-            frames=synt.generate_constant_wave(25450, 0.1),
-        )
+        # sound_controller.playback_start(
+        #     frequency=100,
+        #     duration=DURATION,
+        #     frames=sound_controller.generate_audio_frames(20, 1),
+        # )
+
+        sound_controller.playback_start_threaded(frequency=100, duration=50)  #
+        sound_controller.playback_thread.join()
         # time.sleep(0.1)
-        sound_controller.playback_start(
-            frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(25425, 0.1)
-        )
-        time.sleep(0.1)
+        # sound_controller.playback_start(
+        #     frequency=FREQUENCY, duration=DURATION, frames=synt.generate_constant_wave(25425, 0.1)
+        # )
+        # time.sleep(0.1)
 
     # wave_25425 = synt.generate_constant_wave(25450, 5)
     # wave_25450 = synt.generate_constant_wave(25450, 5)

@@ -19,6 +19,7 @@ from constants import (
     PACKET_TYPE_UPDATE_RATE_TO_REQUEST,
     PACKETS_TO_COLLECT_WITH_AUDIO,
     PACKETS_TO_COLLECT_WITHOUT_AUDIO,
+    REPEAT_TIMES,
     RESET_INPUT_BUFFER,
     SHOW_PLOTS,
     TIME_ELAPSED_COL_NAME,
@@ -83,6 +84,7 @@ analyzer = None
 
 
 def launch():
+    repeated_times = 0
     logger.info("START")
 
     drone_controller_cls = DroneController
@@ -134,7 +136,14 @@ def launch():
         sound_controller.playback_thread.join()
 
         logger.info(f"Stop {current_audio_frequency}Hz test:\r\n-----------------------------------------")
+
         current_audio_frequency += AUDIO_FREQUENCY_STEP
+
+        # TODO: move flow logic to separate class
+        if current_audio_frequency > AUDIO_FREQUENCY_LIMIT and repeated_times <= REPEAT_TIMES:
+            repeated_times += 1
+            logger.info(f"Limit frequency reached in ({repeated_times}/{REPEAT_TIMES})th iteration, start again")
+            current_audio_frequency = INITIAL_AUDIO_FREQUENCY
 
     logger.info(
         f"----------------------------------------------\r\n"

@@ -15,6 +15,7 @@ pyaudio = "^0.2.14"
 strenum = "^0.4.15"
 synthesizer = "^0.2.0"
 pyserial = "^3.5"
+jupyter = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
