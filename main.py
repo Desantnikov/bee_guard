@@ -35,6 +35,7 @@ TODO:
     + set system time on startup
     + check `time_boot_ms` to detect unexpected reboot
     filter noise when playback
+    playback audio spectrogram shows many harmonics, while real sinus doesn't have harmonics
     make packets collecting and sound playback time equal
     + handle drone-pc communication breakdown
     adjust drawing plots
